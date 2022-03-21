@@ -1,0 +1,947 @@
+@use "variables" as *;
+
+.red {
+  border: solid 1px red;
+}
+
+.blue {
+  border: solid 1px blue;
+}
+
+.header {
+  background: #333;
+
+  &_hamburger {
+    background: #999;
+    color: #333;
+  }
+}
+
+.footer {
+  background: #033;
+}
+
+
+.elmNeatLayout {
+  $prefix: &;
+  $boundary: #{$prefix}--boundary;
+  $boundaryCore: #{$boundary}_core;
+  $textNode: #{$prefix}--textNode;
+  $textNodeText: #{$textNode}_text;
+  $scroller: #{$prefix}--scroller;
+  $scrollerCore: #{$scroller}_core;
+
+  &--top {
+    display: block;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: auto;
+
+    & > #{$boundaryCore} {
+      height: 100%;
+    }
+
+    & > #{$scrollerCore} {
+      height: 100%;
+    }
+  }
+
+  &--boundary {
+    padding: calc(var(--outer-gap-y) / 2) calc(var(--outer-gap-x) / 2);
+    $boundary: &;
+
+    & > &_core {
+      padding: calc(var(--inner-gap-y) / 2) calc(var(--inner-gap-x) / 2);
+
+    }
+
+    &-requireBefore > &_core {
+      &::before {
+        display: inline-block;
+        /* content: ''; */
+        height: 100%;
+      }
+    }
+
+    &#{$prefix}--rowChild-inline {
+      display: inline-block;
+    }
+    &#{$prefix}--rowChild-flex {
+      display: block;
+    }
+    &#{$prefix}--columnChild-block {
+      display: block;
+    }
+    &#{$prefix}--columnChild-flex {
+      display: block;
+    }
+    &#{$prefix}--top {
+      display: block;
+    }
+    &#{$prefix}--boundaryContent {
+      display: inline-block;
+    }
+    &#{$prefix}--scrollerContent {
+      display: inline-block;
+    }
+
+    &-verticalSpaceBehind {
+      & > #{$boundaryCore} > #{$prefix}--boundaryContent,
+      & > #{$boundaryCore}::before {
+        vertical-align: top;
+      }
+    }
+
+    &-verticalSpaceForward {
+      & > #{$boundaryCore} > #{$prefix}--boundaryContent,
+      & > #{$boundaryCore}::before {
+      }
+        vertical-align: bottom;
+    }
+
+    &-verticalSpaceBoth {
+      & > #{$boundaryCore} > #{$prefix}--boundaryContent,
+      & > #{$boundaryCore}::before {
+        vertical-align: middle;
+      }
+    }
+
+    &-horizontalSpaceBehind {
+      & > #{$boundaryCore} {
+        text-align: left;
+      }
+    }
+
+    &-horizontalSpaceForward {
+      & > #{$boundaryCore} {
+        text-align: right;
+      }
+    }
+
+    &-horizontalSpaceBoth {
+      & > #{$boundaryCore} {
+        text-align: center;
+      }
+    }
+  }
+
+  &--scroller {
+    padding: calc(var(--outer-gap-y) / 2) calc(var(--outer-gap-x) / 2);
+    flex-shrink: 1;
+    $scroller: &;
+
+    &-vertical > &_core {
+      overflow-y: auto;
+    }
+
+    &-horizontal > &_core {
+      overflow-x: auto;
+    }
+
+    &-requireBefore > &_core {
+      &::before {
+        display: inline-block;
+        /* content: ''; */
+        height: 100%;
+      }
+    }
+
+    &#{$prefix}--rowChild-inline {
+      display: inline-block;
+    }
+    &#{$prefix}--rowChild-flex {
+      display: block;
+    }
+    &#{$prefix}--columnChild-block {
+      display: block;
+    }
+    &#{$prefix}--columnChild-flex {
+      display: block;
+    }
+    &#{$prefix}--top {
+      display: block;
+    }
+    &#{$prefix}--boundaryContent {
+      display: inline-block;
+    }
+    &#{$prefix}--scrollerContent {
+      display: inline-block;
+    }
+
+    &-verticalSpaceBehind {
+      & > #{$scrollerCore} > #{$prefix}--scrollerContent,
+      & > #{$scrollerCore}::before {
+        vertical-align: top;
+      }
+    }
+
+    &-verticalSpaceForward {
+      & > #{$scrollerCore} > #{$prefix}--scrollerContent,
+      & > #{$scrollerCore}::before {
+      }
+        vertical-align: bottom;
+    }
+
+    &-verticalSpaceBoth {
+      & > #{$scrollerCore} > #{$prefix}--scrollerContent,
+      & > #{$scrollerCore}::before {
+        vertical-align: middle;
+      }
+    }
+
+    &-horizontalSpaceBehind {
+      & > #{$scrollerCore} {
+        text-align: left;
+      }
+    }
+
+    &-horizontalSpaceForward {
+      & > #{$scrollerCore} {
+        text-align: right;
+      }
+    }
+
+    &-horizontalSpaceBoth {
+      & > #{$scrollerCore} {
+        text-align: center;
+      }
+    }
+  }
+
+  &--row-inline {
+    $rowInline: &;
+
+    &#{$prefix}--row-nowrap {
+      white-space: nowrap;
+    }
+
+    &#{$prefix}--rowChild-inline {
+      display: inline-block;
+    }
+    &#{$prefix}--rowChild-flex {
+      display: block;
+    }
+    &#{$prefix}--columnChild-block {
+      display: block;
+    }
+    &#{$prefix}--columnChild-flex {
+      display: block;
+    }
+    &#{$prefix}--top {
+      display: block;
+    }
+    &#{$prefix}--boundaryContent {
+      display: inline-block;
+    }
+    &#{$prefix}--scrollerContent {
+      display: inline-block;
+    }
+
+    &-requireBefore {
+      &::before {
+        display: inline-block;
+        /* content: ''; */
+        height: 100%;
+      }
+    }
+
+    &-verticalSpaceBehind {
+      & > #{$prefix}--rowChild-inline {
+        vertical-align: top;
+      }
+
+      & > #{$rowInline}::before {
+        vertical-align: top;
+      }
+    }
+
+    &-verticalSpaceForward {
+      & > #{$prefix}--rowChild-inline {
+        vertical-align: bottom;
+      }
+
+      & > #{$rowInline}::before {
+        vertical-align: bottom;
+      }
+    }
+
+    &-verticalSpaceBoth {
+      & > #{$prefix}--rowChild-inline {
+        vertical-align: middle;
+      }
+
+      & > #{$rowInline}::before {
+        vertical-align: middle;
+      }
+    }
+
+    &-horizontalSpaceBehind {
+      text-align: left;
+    }
+
+    &-horizontalSpaceForward {
+      text-align: right;
+    }
+
+    &-horizontalSpaceBoth {
+      text-align: center;
+    }
+  }
+
+  &--row-flex {
+    flex-direction: row;
+    &#{$prefix}--row-nowrap {
+      flex-wrap: nowrap;
+    }
+
+    &#{$prefix}--rowChild-inline {
+      display: inline-flex;
+    }
+    &#{$prefix}--rowChild-flex {
+      display: flex;
+    }
+    &#{$prefix}--columnChild-block {
+      display: flex;
+    }
+    &#{$prefix}--columnChild-flex {
+      display: flex;
+    }
+    &#{$prefix}--top {
+      display: flex;
+    }
+    &#{$prefix}--boundaryContent {
+      display: inline-flex;
+    }
+    &#{$prefix}--scrollerContent {
+      display: inline-flex;
+    }
+
+    &-verticalSpaceBehind {
+      align-items: flex-start;
+    }
+
+    &-verticalSpaceForward {
+      align-items: flex-end;
+    }
+
+    &-verticalSpaceBoth {
+      align-items: center;
+    }
+
+    &-horizontalSpaceBehind {
+      justify-content: flex-start;
+    }
+
+    &-horizontalSpaceForward {
+      justify-content: flex-end;
+    }
+
+    &-horizontalSpaceBoth {
+      justify-content: center;
+    }
+  }
+
+  &--column-block {
+    &#{$prefix}--rowChild-inline {
+      display: inline-block;
+    }
+    &#{$prefix}--rowChild-flex {
+      display: block;
+    }
+    &#{$prefix}--columnChild-block {
+      display: block;
+    }
+    &#{$prefix}--columnChild-flex {
+      display: block;
+    }
+    &#{$prefix}--top {
+      display: block;
+    }
+    &#{$prefix}--boundaryContent {
+      display: inline-block;
+    }
+    &#{$prefix}--scrollerContent {
+      display: inline-block;
+    }
+
+    &-horizontalSpaceBehind {
+      & #{$prefix}--columnChild-block {
+        margin-right: auto;
+      }
+    }
+
+    &-horizontalSpaceForward {
+      & #{$prefix}--columnChild-block {
+        margin-left: auto;
+      }
+    }
+
+    &-horizontalSpaceBoth {
+      & #{$prefix}--columnChild-block {
+        margin-right: auto;
+        margin-left: auto;
+      }
+    }
+  }
+
+  &--column-flex {
+    flex-direction: column;
+
+    &#{$prefix}--rowChild-inline {
+      display: inline-flex;
+    }
+    &#{$prefix}--rowChild-flex {
+      display: flex;
+    }
+    &#{$prefix}--columnChild-block {
+      display: flex;
+    }
+    &#{$prefix}--columnChild-flex {
+      display: flex;
+    }
+    &#{$prefix}--top {
+      display: flex;
+    }
+    &#{$prefix}--boundaryContent {
+      display: inline-flex;
+    }
+    &#{$prefix}--scrollerContent {
+      display: inline-flex;
+    }
+
+    &-verticalSpaceBehind {
+      justify-content: flex-start;
+    }
+
+    &-verticalSpaceForward {
+      justify-content: flex-end;
+    }
+
+    &-verticalSpaceBoth {
+      justify-content: center;
+    }
+
+    &-horizontalSpaceBehind {
+      align-items: flex-start;
+    }
+
+    &-horizontalSpaceForward {
+      align-items: flex-end;
+    }
+
+    &-horizontalSpaceBoth {
+      align-items: center;
+    }
+  }
+
+  &--textNode {
+    $textNode: &;
+    overflow: hidden;
+    padding: 0 calc(var(--outer-gap-x) / 2);
+
+    &#{$prefix}--rowChild-inline {
+      display: inline-block;
+    }
+    &#{$prefix}--rowChild-flex {
+      display: block;
+    }
+    &#{$prefix}--columnChild-block {
+      display: block;
+    }
+    &#{$prefix}--columnChild-flex {
+      display: block;
+    }
+    &#{$prefix}--top {
+      display: block;
+    }
+    &#{$prefix}--boundaryContent {
+      display: inline-block;
+    }
+    &#{$prefix}--scrollerContent {
+      display: inline-block;
+    }
+
+    &-requireBefore {
+      &::before {
+        display: inline-block;
+        /* content: ''; */
+        height: 100%;
+      }
+    }
+
+    &_text {
+      display: inline-block;
+    }
+
+    &-verticalSpaceBehind {
+      & > #{$textNodeText} {
+        vertical-align: top;
+      }
+
+      & > #{$textNode}::before {
+        vertical-align: top;
+      }
+    }
+
+    &-verticalSpaceForward {
+      & > #{$textNodeText} {
+        vertical-align: bottom;
+      }
+
+      & > #{$textNode}::before {
+        vertical-align: bottom;
+      }
+    }
+
+    &-verticalSpaceBoth {
+      & > #{$textNodeText} {
+        vertical-align: middle;
+      }
+
+      & > #{$textNode}::before {
+        vertical-align: middle;
+      }
+    }
+
+    &-horizontalSpaceBehind {
+      text-align: left;
+    }
+
+    &-horizontalSpaceForward {
+      text-align: right;
+    }
+
+    &-horizontalSpaceBoth {
+      text-align: center;
+    }
+
+    &_text_inline {
+      line-height: calc(1em + var(--outer-gap-y));
+    }
+  }
+
+  &--rowChild-inline, &--columnChild-block, &--columnChild-flex, &--boundaryContent, &--scrollerContent {
+    &-maxWidthFit:not(#{$boundary}):not(#{$textNode}):not(#{$scroller}) {
+      width: min-content;
+      min-width: var(--min-width);
+    }
+
+    &-maxWidthFit#{$boundary} {
+      width: min-content;
+
+      & > #{$boundaryCore} {
+        width: min-content;
+        min-width: var(--min-width);
+      }
+    }
+
+    &-maxWidthFit#{$textNode} {
+      width: min-content;
+
+      & > #{$textNodeText} {
+        width: min-content;
+        min-width: var(--min-width);
+      }
+    }
+
+    &-maxWidthFit#{$scroller} {
+      & > #{$scrollerCore} {
+        width: min-content;
+        min-width: var(--min-width);
+      }
+    }
+
+    &-maxWidthInfinite:not(#{$boundary}):not(#{$textNode}):not(#{$scroller}) {
+      min-width: min-content;
+      width: max(100%, var(--min-width));
+    }
+
+    &-maxWidthInfinite#{$boundary} {
+      min-width: min-content;
+      width: max(100%, calc(var(--min-width) + var(--outer-gap-x)));
+
+      & > #{$boundaryCore} {
+        min-width: min-content;
+        width: max(100%, var(--min-width));
+      }
+    }
+
+    &-maxWidthInfinite#{$textNode} {
+      min-width: min-content;
+      width: max(100%, calc(var(--min-width) + var(--outer-gap-x)));
+
+      & > #{$textNodeText} {
+        min-width: min-content;
+        width: max(100%, var(--min-width));
+      }
+    }
+
+    &-maxWidthInfinite#{$scroller} {
+      min-width: min-content;
+      width: max(100%, calc(var(--min-width) + var(--outer-gap-x)));
+
+      & > #{$scrollerCore} {
+        min-width: min-content;
+        width: max(100%, var(--min-width));
+      }
+    }
+
+    &-maxWidthInUnit:not(#{$boundary}):not(#{$textNode}):not(#{$scroller}) {
+      min-width: var(--min-width);
+      max-width: var(--max-width);
+      width: 100%;
+    }
+
+    &-maxWidthInUnit#{$boundary} {
+      min-width: calc(var(--min-width) + var(--outer-gap-x));
+      max-width: calc(var(--max-width) + var(--outer-gap-x));
+      width: 100%;
+
+      & > #{$boundaryCore} {
+        min-width: var(--min-width);
+        max-width: var(--max-width);
+        width: 100%;
+      }
+    }
+
+    &-maxWidthInUnit#{$textNode} {
+      min-width: calc(var(--min-width) + var(--outer-gap-x));
+      max-width: calc(var(--max-width) + var(--outer-gap-x));
+      width: 100%;
+
+      & > #{$textNodeText} {
+        min-width: var(--min-width);
+        max-width: var(--max-width);
+        width: 100%;
+      }
+    }
+
+    &-maxWidthInUnit#{$scroller} {
+      min-width: calc(var(--min-width) + var(--outer-gap-x));
+      max-width: calc(var(--max-width) + var(--outer-gap-x));
+      width: 100%;
+
+      & > #{$scrollerCore} {
+        min-width: var(--min-width);
+        max-width: var(--max-width);
+        width: 100%;
+      }
+    }
+  }
+
+  &--rowChild-flex, &--rowChild-inline, &--columnChild-block, &--boundaryContent, &--scrollerContent {
+    &-maxHeightFit:not(#{$boundary}):not(#{$textNode}):not(#{$scroller}) {
+      height: min-content;
+      min-height: var(--min-height);
+    }
+
+    &-maxHeightFit#{$boundary} {
+      height: min-content;
+
+      & > #{$boundaryCore} {
+        height: min-content;
+        min-height: var(--min-height);
+      }
+    }
+
+    &-maxHeightFit#{$textNode} {
+      height: min-content;
+
+      & > #{$textNodeText} {
+        height: min-content;
+        min-height: var(--min-height);
+      }
+    }
+
+    &-maxHeightFit#{$scroller} {
+      & > #{$scrollerCore} {
+        height: min-content;
+        min-height: var(--min-height);
+      }
+    }
+
+    &-maxHeightInfinite:not(#{$boundary}):not(#{$textNode}):not(#{$scroller}) {
+      height: 100%;
+      min-height: var(--min-height);
+    }
+
+    &-maxHeightInfinite#{$boundary} {
+      height: 100%;
+      min-height: min-content;
+      overflow: auto;
+
+      & > #{$boundaryCore} {
+        height: 100%;
+        min-height: var(--min-height);
+      }
+    }
+
+    &-maxHeightInfinite#{$textNode} {
+      height: 100%;
+      min-height: var(--min-height);
+
+      & > #{$textNodeText} {
+        height: 100%;
+        min-height: var(--min-height);
+      }
+    }
+
+    &-maxHeightInfinite#{$scroller} {
+      height: 100%;
+      min-height: calc(var(--min-height) + var(--outer-gap-y));
+
+      & > #{$scrollerCore} {
+        height: 100%;
+        min-height: var(--min-height);
+      }
+    }
+
+    &-maxHeightInUnit:not(#{$boundary}):not(#{$textNode}):not(#{$scroller}) {
+      min-height: var(--min-height);
+      max-height: var(--max-height);
+      height: 100%;
+    }
+
+    &-maxHeightInUnit#{$boundary} {
+      max-height: calc(var(--max-height) + var(--outer-gap-y));
+      height: 100%;
+      min-height: min-content;
+      overflow: auto;
+
+      & > #{$boundaryCore} {
+        min-height: var(--min-height);
+        max-height: var(--max-height);
+        height: 100%;
+      }
+    }
+
+    &-maxHeightInUnit#{$textNode} {
+      min-height: var(--min-height);
+      max-height: var(--max-height);
+      height: 100%;
+
+      & > #{$textNodeText} {
+        min-height: var(--min-height);
+        max-height: var(--max-height);
+        height: 100%;
+      }
+    }
+
+    &-maxHeightInUnit#{$scroller} {
+      min-height: calc(var(--min-height) + var(--outer-gap-y));
+      max-height: calc(var(--max-height) + var(--outer-gap-y));
+      height: 100%;
+
+      & > #{$scrollerCore} {
+        min-height: var(--min-height);
+        max-height: var(--max-height);
+        height: 100%;
+      }
+    }
+  }
+
+  &--rowChild-flex {
+    flex-shrink: 0;
+
+    &-maxWidthFit {
+      max-width: min-content;
+    }
+
+    &-maxWidthInfinite {
+      flex-grow: 2147483647;
+
+      & > #{$boundaryCore} {
+        width: 100%;
+      }
+      & > #{$scrollerCore} {
+        width: 100%;
+      }
+    }
+
+    &-maxWidthInUnit:not(#{$boundary}):not(#{$scroller}):not(#{$textNode}) {
+      flex-grow: 1;
+      max-width: var(--max-width);
+    }
+
+    &-maxWidthInUnit#{$boundary} {
+      flex-grow: 1;
+      max-width: calc(var(--max-width) + var(--outer-gap-x));
+
+      & > #{$boundaryCore} {
+        width: 100%;
+      }
+    }
+
+    &-maxWidthInUnit#{$scroller} {
+      flex-grow: 1;
+      max-width: calc(var(--max-width) + var(--outer-gap-x));
+
+      & > #{$scrollerCore} {
+        width: 100%;
+      }
+    }
+
+    &-maxWidthInUnit#{$textNode} {
+      flex-grow: 1;
+      max-width: calc(var(--max-width) + var(--outer-gap-x));
+    }
+  }
+
+  &--columnChild-flex {
+    &-maxHeightFit:not(#{$boundary}):not(#{$textNode}):not(#{$scroller}) {
+      height: min-content;
+      min-height: var(--min-height);
+      flex-grow: 0;
+      flex-shrink: 0;
+    }
+
+    &-maxHeightFit#{$boundary} {
+      height: min-content;
+      min-height: calc(var(--min-height) + var(--outer-gap-y));
+      flex-grow: 0;
+      flex-shrink: 0;
+
+      & > #{$boundaryCore} {
+        height: min-content;
+        min-height: var(--min-height);
+      }
+    }
+
+    &-maxHeightFit#{$textNode} {
+      height: min-content;
+      min-height: var(--min-height);
+      flex-grow: 0;
+      flex-shrink: 0;
+
+      & > #{$textNodeText} {
+        height: min-content;
+        min-height: var(--min-height);
+      }
+    }
+
+    &-maxHeightFit#{$scroller} {
+      height: min-content;
+      min-height: var(--min-height);
+      flex-grow: 0;
+
+      &-horizontal {
+        flex-shrink: 0;
+      }
+
+      &-vertical {
+        flex-shrink: 1;
+      }
+
+      & > #{$scrollerCore} {
+        height: min-content;
+        min-height: var(--min-height);
+      }
+    }
+
+    &-maxHeightInfinite:not(#{$boundary}):not(#{$textNode}):not(#{$scroller}) {
+      height: var(--min-height);
+      min-height: var(--min-height);
+      flex-grow: 1;
+      flex-shrink: 0;
+    }
+
+    &-maxHeightInfinite#{$boundary} {
+      flex-grow: 1;
+      flex-shrink: 0;
+      overflow-y: auto;
+      height: min-content;
+
+      & > #{$boundaryCore} {
+        height: var(--min-height);
+        min-height: 100%;
+      }
+    }
+
+    &-maxHeightInfinite#{$textNode} {
+      height: var(--min-height);
+      min-height: var(--min-height);
+      flex-grow: 1;
+      flex-shrink: 0;
+
+      & > #{$textNodeText} {
+        height: var(--min-height);
+        min-height: 100%;
+      }
+    }
+
+    &-maxHeightInfinite#{$scroller} {
+      height: var(--min-height);
+      min-height: var(--min-height);
+      flex-grow: 1;
+
+      &-horizontal {
+        flex-shrink: 0;
+      }
+
+      &-vertical {
+        flex-shrink: 1;
+      }
+
+      & > #{$scrollerCore} {
+        height: var(--min-height);
+        min-height: 100%;
+      }
+    }
+
+    &-maxHeightInUnit:not(#{$boundary}):not(#{$scroller}):not(#{$textNode}) {
+      height: var(--min-height);
+      max-height: var(--max-height);
+      flex-grow: 1;
+      flex-shrink: 0;
+    }
+
+    &-maxHeightInUnit#{$boundary} {
+      flex-grow: 1;
+      flex-shrink: 0;
+      overflow-y: auto;
+      height: min-content;
+
+      & > #{$boundaryCore} {
+        height: var(--min-height);
+        max-height: var(--max-height);
+        min-height: 100%;
+      }
+    }
+
+    &-maxHeightInUnit#{$textNode} {
+      height: var(--min-height);
+      max-height: var(--max-height);
+      flex-grow: 1;
+      flex-shrink: 0;
+
+      & > #{$textNodeText} {
+        height: var(--min-height);
+        max-height: var(--max-height);
+        min-height: 100%;
+      }
+    }
+
+    &-maxHeightInUnit#{$scroller} {
+      height: calc(var(--min-height) + var(--outer-gap-y));
+      max-height: calc(var(--max-height) + var(--outer-gap-y));
+      flex-grow: 1;
+
+      &-horizontal {
+        flex-shrink: 0;
+      }
+
+      &-vertical {
+        flex-shrink: 1;
+      }
+
+      & > #{$scrollerCore} {
+        height: var(--min-height);
+        max-height: var(--max-height);
+        min-height: 100%;
+      }
+    }
+  }
+}

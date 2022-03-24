@@ -7,7 +7,7 @@ import Html.Attributes as Attributes
 import Html.Events as Events
 import Mixin
 import Mixin.Html as Mixin
-import Neat exposing (View, NoGap)
+import Neat exposing (Boundary, View, NoGap)
 
 
 
@@ -57,63 +57,87 @@ view model =
     }
 
 
-body : Model -> View NoGap Msg
+body : Model -> Boundary Msg
 body _ =
     Neat.column
-        [ Neat.nowrapRow
-            [ Neat.textBlock Gap.body "Header"
-            , Neat.textBlock Gap.body "三"
-                -- |> Neat.setMaxWidthFit
-                |> Neat.setBoundary
+        ( Neat.defaultColumn
+            |> Neat.alignBottom
+        )
+        [ Neat.row
+            Neat.defaultRow
+            [ Neat.textBlock "Header"
+                |> Neat.setMaxWidthInfinite
+                |> Neat.setGap Gap.body
+                |> Neat.middleItem "text"
+            , Neat.textBlock "三"
                 |> Neat.setMinWidthInEm 3
                 |> Neat.setMaxWidthInEm 3
                 |> Neat.setMinHeightInEm 3
-                |> Neat.pullChildrenVCenter
-                |> Neat.pullChildrenHCenter
                 |> Neat.setMixin (Mixin.class "header_hamburger")
                 |> Neat.setGap Gap.body
+                |> Neat.middleItem "hamburger"
             ]
                 |> Neat.setBoundary
-                |> Neat.setMaxHeightFit
-                |> Neat.pullChildrenVCenter
+                |> Neat.setMaxWidthInfinite
                 |> Neat.setMixin (Mixin.class "header")
+                |> Neat.setGap Neat.noGap
+                |> Neat.leftItem "header"
         , Neat.column
-            [ Neat.textBlock Gap.body
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                -- |> Neat.setMinHeightInEm 10
-                -- |> Neat.setMaxHeightInEm 25
-                -- |> Neat.setMaxWidthInEm 25
-                -- |> Neat.setMinWidthInEm 16
+            Neat.defaultColumn
+            [ Neat.textBlock
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                |> Neat.setMinHeightInEm 10
+                |> Neat.setMaxHeightInEm 25
+                |> Neat.setMaxWidthInEm 25
+                |> Neat.setMinWidthInEm 16
+                |> Neat.setGap Gap.body
+                |> Neat.grownLeftItem "sampleText"
             , Neat.empty
                 |> Neat.setMinHeightInEm 5
                 |> Neat.setMinWidthInEm 10
                 |> Neat.setMaxWidthInEm 20
+                |> Neat.setMaxHeightInfinite
                 |> Neat.setMixin (Mixin.class "red")
                 |> Neat.setGap Gap.body
-            , Neat.empty
-                |> Neat.setMinHeightInEm 5
-                |> Neat.setMinWidthInEm 12
-                |> Neat.setMixin (Mixin.class "blue")
-                |> Neat.setGap Gap.body
+                |> Neat.leftItem "sampleBox"
+            , Neat.row
+                (Neat.defaultRow
+                    |> Neat.alignRight
+                )
+                [ Neat.empty
+                    |> Neat.setMinHeightInEm 5
+                    |> Neat.setMaxHeightInfinite
+                    |> Neat.setMinWidthInEm 12
+                    |> Neat.setMaxWidthInEm 23
+                    |> Neat.setMixin (Mixin.class "blue")
+                    |> Neat.setGap Gap.body
+                    |> Neat.grownBottomItem "sampleBox"
+                ]
                 |> Neat.setBoundary
-                |> Neat.pullChildrenRight
                 |> Neat.setMixin (Mixin.class "red")
-                |> Neat.setMinWidthInEm 7
-                |> Neat.setMaxWidthFit
-                |> Neat.setMaxHeightInEm 3
+                |> Neat.setMinWidthInEm 37
+                |> Neat.setMaxWidthInEm 40
+                |> Neat.setMaxHeightInEm 33
                 |> Neat.setGap Gap.body
+                |> Neat.centerItem "sampleNestedBox"
             ]
-                |> Neat.setBoundary
-                |> Neat.setMinHeightInEm 0
-        , Neat.textBlock Gap.body "Footer"
             |> Neat.setBoundary
-            |> Neat.setMaxHeightFit
+            |> Neat.setMaxHeightInfinite
+            |> Neat.enableVerticalScroll
+            |> Neat.setMixin (Mixin.class "blue")
+            |> Neat.setGap Neat.noGap
+            |> Neat.grownRightItem "body"
+        , Neat.textBlock "Footer"
+            |> Neat.setGap Gap.body
+            |> Neat.setBoundary
+            |> Neat.setMaxWidthInfinite
             |> Neat.setMixin (Mixin.class "footer")
+            |> Neat.setGap Neat.noGap
+            |> Neat.rightItem "footer"
         ]
-        |> Neat.pullChildrenHCenter
-        |> Neat.pullChildrenBottom
         |> Neat.setBoundary
-        |> Neat.setMinWidthInEm 0
+        |> Neat.setMaxHeightInfinite
+        |> Neat.setMaxWidthInfinite
 
 
 subscriptions : Model -> Sub Msg

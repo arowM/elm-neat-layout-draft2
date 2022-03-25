@@ -86,12 +86,13 @@ body _ =
             Neat.defaultColumn
             [ Neat.textBlock
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                |> Neat.setMinHeightInEm 10
+                -- |> Neat.setMinHeightInEm 10
                 |> Neat.setMaxHeightInEm 25
-                |> Neat.setMaxWidthInEm 25
+                -- |> Neat.setMaxWidthInEm 35
+                |> Neat.setMaxWidthInfinite
                 |> Neat.setMinWidthInEm 16
                 |> Neat.setGap Gap.body
-                |> Neat.grownLeftItem "sampleText"
+                |> Neat.leftItem "sampleText"
             , Neat.empty
                 |> Neat.setMinHeightInEm 5
                 |> Neat.setMinWidthInEm 10
@@ -119,10 +120,12 @@ body _ =
                 |> Neat.setMaxWidthInEm 40
                 |> Neat.setMaxHeightInEm 33
                 |> Neat.setGap Gap.body
-                |> Neat.centerItem "sampleNestedBox"
+                |> Neat.grownCenterItem "sampleNestedBox"
             ]
             |> Neat.setBoundary
-            |> Neat.setMaxHeightInfinite
+            -- |> Neat.setMaxHeightInfinite
+            |> Neat.setMinHeightInEm 10
+            |> Neat.setMaxWidthInfinite
             |> Neat.enableVerticalScroll
             |> Neat.setMixin (Mixin.class "blue")
             |> Neat.setGap Neat.noGap

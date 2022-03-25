@@ -26,6 +26,7 @@
   $prefix: &;
   $boundary: #{$prefix}--boundary;
   $boundaryCore: #{$boundary}_core;
+  $boundaryContent: #{$prefix}--boundaryContent;
   $row: #{$prefix}--row;
   $rowChild: #{$prefix}--rowChild;
   $column: #{$prefix}--column;
@@ -62,9 +63,15 @@
       & > #{$boundary}_scroller {
         height: 100%;
         width: 100%;
+
+        &-verticalScroll > #{$boundaryContent}::after {
+          display: block;
+          content: '';
+          padding-top: calc(var(--inner-gap-y) / 2);
+        }
       }
 
-      &#{$boundaryCore}-view, &#{$boundaryCore}-view > #{$boundary}_scroller {
+      &#{$boundaryCore}-view, &#{$boundaryCore} > #{$boundary}_scroller {
         padding: calc(var(--inner-gap-y) / 2) calc(var(--inner-gap-x) / 2);
       }
 
@@ -110,27 +117,14 @@
       justify-content: flex-end;
     }
 
-    & > #{$rowChild} {
-      &#{$rowChild}-alignStart {
-        align-self: flex-start;
-      }
-
-      &#{$rowChild}-alignCenter {
-        align-self: center;
-      }
-
-      &#{$rowChild}-alignEnd {
-        align-self: flex-end;
-      }
-    }
-
     &#{$widthFlex}, &#{$widthMaxSize} {
       display: flex;
       flex-direction: row;
-      flex-shrink: 0;
 
       & > #{$rowChild} {
+        width: auto;
         flex-grow: 0;
+        flex-shrink: 0;
 
         &#{$rowChild}-grow {
           flex-grow: 1;
@@ -144,6 +138,16 @@
             width: 100%;
           }
         }
+
+        &#{$rowChild}-alignStart {
+          align-self: flex-start;
+        }
+        &#{$rowChild}-alignCenter {
+          align-self: center;
+        }
+        &#{$rowChild}-alignEnd {
+          align-self: flex-end;
+        }
       }
     }
 
@@ -152,6 +156,42 @@
 
       & > #{$rowChild} {
         width: auto;
+
+        &#{$row} {
+          &#{$widthFlex}, &#{$widthMaxSize} {
+            display: inline-flex;
+          }
+
+          &#{$widthMinSize} {
+            display: inline-block;
+          }
+        }
+
+        &#{$column} {
+          &#{$heightFlex}, &#{$heightMaxSize} {
+            display: inline-flex;
+          }
+
+          &#{$heightMinSize} {
+            display: inline-block;
+          }
+        }
+
+        &#{$boundary} {
+          display: inline-block;
+        }
+
+        &#{$rowChild}-alignStart {
+          margin-right: auto;
+        }
+
+        &#{$rowChild}-alignCenter {
+          margin: 0 auto;
+        }
+
+        &#{$rowChild}-alignEnd {
+          margin-left: auto;
+        }
       }
     }
   }
@@ -167,25 +207,14 @@
       justify-content: flex-end;
     }
 
-    & > #{$columnChild} {
-      &#{$columnChild}-alignStart {
-        align-self: flex-start;
-      }
-      &#{$columnChild}-alignCenter {
-        align-self: center;
-      }
-      &#{$columnChild}-alignEnd {
-        align-self: flex-end;
-      }
-    }
-
     &#{$heightFlex}, &#{$heightMaxSize} {
       display: flex;
       flex-direction: column;
-      flex-shrink: 0;
 
       & > #{$columnChild} {
+        height: auto;
         flex-grow: 0;
+        flex-shrink: 0;
 
         &#{$columnChild}-grow {
           flex-grow: 1;
@@ -199,6 +228,16 @@
             height: 100%;
           }
         }
+
+        &#{$columnChild}-alignStart {
+          align-self: flex-start;
+        }
+        &#{$columnChild}-alignCenter {
+          align-self: center;
+        }
+        &#{$columnChild}-alignEnd {
+          align-self: flex-end;
+        }
       }
     }
 
@@ -207,6 +246,18 @@
 
       & > #{$columnChild} {
         height: auto;
+
+        &#{$columnChild}-alignStart {
+          margin-right: auto;
+        }
+
+        &#{$columnChild}-alignCenter {
+          margin: 0 auto;
+        }
+
+        &#{$columnChild}-alignEnd {
+          margin-left: auto;
+        }
       }
     }
   }

@@ -66,10 +66,17 @@ body _ =
         [ Neat.row
             Neat.defaultRow
             [ Neat.textBlock "Header"
-                |> Neat.setMaxWidthInfinite
                 |> Neat.setGap Gap.body
-                |> Neat.middleItem "text"
-            , Neat.textBlock "三"
+                |> Neat.grownMiddleItem "text"
+            , Neat.row
+                (Neat.defaultRow
+                    |> Neat.alignCenter
+                )
+                [ Neat.textBlock "三"
+                    |> Neat.setGap Neat.noGap
+                    |> Neat.middleItem "icon"
+                ]
+                |> Neat.setBoundary
                 |> Neat.setMinWidthInEm 3
                 |> Neat.setMaxWidthInEm 3
                 |> Neat.setMinHeightInEm 3
@@ -119,6 +126,19 @@ body _ =
                 |> Neat.setMinWidthInEm 37
                 |> Neat.setMaxWidthInEm 40
                 |> Neat.setMaxHeightInEm 33
+                |> Neat.putLayer "overlay"
+                    ( { top = 50
+                      , bottom = 0
+                      , left = 0
+                      , right = 50
+                      , priority = Nothing
+                      }
+                    , Neat.empty
+                        |> Neat.setMaxHeightInfinite
+                        |> Neat.setMaxWidthInEm 20
+                        |> Neat.setMixin (Mixin.class "red")
+                        |> Neat.toLayered
+                    )
                 |> Neat.setGap Gap.body
                 |> Neat.grownCenterItem "sampleNestedBox"
             ]

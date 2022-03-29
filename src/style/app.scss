@@ -2,10 +2,12 @@
 
 .red {
   border: solid 1px red;
+  background-color: #fee;
 }
 
 .blue {
   border: solid 1px blue;
+  background-color: #eef;
 }
 
 .header {
@@ -52,6 +54,22 @@
     max-height: var(--max-height);
   }
 
+  &--overlay {
+    display: block;
+    position: absolute;
+    pointer-events: none;
+    top: var(--overlay-top);
+    bottom: var(--overlay-bottom);
+    left: var(--overlay-left);
+    right: var(--overlay-right);
+    z-index: var(--overlay-priority);
+    overflow: hidden;
+    min-width: var(--min-height);
+    max-width: var(--max-height);
+    min-height: var(--min-height);
+    max-height: var(--max-height);
+  }
+
   &--boundary {
     padding: calc(var(--outer-gap-y) / 2) calc(var(--outer-gap-x) / 2);
 
@@ -59,6 +77,14 @@
       overflow: hidden;
       height: 100%;
       width: 100%;
+
+      &-hasOverlays {
+        position: relative;
+      }
+
+      &-enforcePointerEvent {
+        pointer-events: auto;
+      }
 
       & > #{$boundary}_scroller {
         height: 100%;

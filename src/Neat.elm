@@ -4,6 +4,7 @@ module Neat exposing
     , NoGap
     , noGap
     , Boundary
+    , mapBoundary
     , Renderer
     , defaultRenderer
     , setBaseSizeInRem
@@ -65,12 +66,12 @@ module Neat exposing
     , setBoundary
     , enableVerticalScroll
     , enableHorizontalScroll
-    -- , putLayer
+    , putLayer
     , Layer
     , defaultLayer
-    -- , Layered
-    -- , mapLayered
-    -- , toLayered
+    , Layered
+    , mapLayered
+    , toLayered
     -- , when
     -- , unless
     -- , withMaybe
@@ -354,6 +355,7 @@ type alias Boundary_ msg =
     , maxHeight : MaxHeight
     , verticalOverflow : Bool
     , content : Content msg
+    , enforcePointerEvent : Bool
     }
 
 
@@ -379,6 +381,7 @@ defaultBoundary =
     , maxHeight = MaxHeightFit
     , verticalOverflow = False
     , content = NoContent
+    , enforcePointerEvent = False
     }
 
 type Size
@@ -449,8 +452,7 @@ type alias Overlays msg =
 type alias Overlay msg =
     { name : String
     , area : Layer
-    , view : Boundary msg
-    , priority : Maybe Int
+    , boundary : Boundary msg
     }
 
 
@@ -460,8 +462,7 @@ mapOverlays f =
         (\o ->
             { name = o.name
             , area = o.area
-            , view = mapBoundary f o.view
-            , priority = o.priority
+            , boundary = mapBoundary f o.boundary
             }
         )
 
@@ -633,40 +634,6 @@ modifyChild f (Children item0 items) =
                 |> Children (modifyContent item0)
 
 
-{-| Set the position of each edge of the overlay layer as a percentage of the base view.
-
-The `priority` field specifies how much the element is superimposed on the front side in preference to other elements. If given `Nothing`, it is set equivalent priority comparing to other elements.
--}
-type alias Layer =
-    { top : Float
-    , bottom : Float
-    , left : Float
-    , right : Float
-    , priority : Maybe Int
-    }
-
-
-{-|
-
-    defaultLayer
-    --> { top = 0
-    --> , bottom = 0
-    --> , left = 0
-    --> , right = 0
-    --> , priority = Nothing
-    --> }
-
--}
-defaultLayer : Layer
-defaultLayer =
-    { top = 0
-    , bottom = 0
-    , left = 0
-    , right = 0
-    , priority = Nothing
-    }
-
-
 {-| -}
 map : (a -> b) -> View gap a -> View gap b
 map f =
@@ -711,6 +678,7 @@ map_ f view =
             None
 
 
+{-| -}
 mapBoundary : (a -> b) -> Boundary a -> Boundary b
 mapBoundary f (Boundary boundary) =
     mapBoundary_ f boundary
@@ -739,6 +707,7 @@ mapBoundary_ f o =
             ViewContent <| map_ f view
         NoContent ->
             NoContent
+    , enforcePointerEvent = o.enforcePointerEvent
     }
 
 
@@ -1439,7 +1408,7 @@ render (Renderer renderer) (Boundary boundary) =
         }
             |> preprocessHeight
             |> preprocessWidth
-            |> renderBoundary renderer childMixin
+            |> renderBoundary renderer childMixin []
 
 
 preprocessHeight : Boundary_ msg -> Boundary_ msg
@@ -1609,7 +1578,7 @@ render_ : Renderer_
 render_ renderer childMixin view =
     case view of
         FromBoundary o ->
-            renderBoundary renderer childMixin o
+            renderBoundary renderer childMixin [] o
 
         FromRow o ->
             renderRow renderer childMixin o
@@ -1621,8 +1590,8 @@ render_ renderer childMixin view =
             Html.text ""
 
 
-renderBoundary : Renderer_ -> ChildMixin msg -> Boundary_ msg -> Html msg
-renderBoundary renderer { inherit, self } o =
+renderBoundary : Renderer_ -> ChildMixin msg -> List (String, String) -> Boundary_ msg -> Html msg
+renderBoundary renderer { inherit, self } custom o =
     let
         childMixin =
             { inherit =
@@ -1641,7 +1610,7 @@ renderBoundary renderer { inherit, self } o =
             , self = class "boundaryContent"
             }
         base =
-            [ boundaryCustomProperty renderer o
+            [ boundaryCustomProperty renderer custom o
             , childMixin.inherit
             , self
             , class "boundary"
@@ -1662,6 +1631,18 @@ renderBoundary renderer { inherit, self } o =
               else
                 Mixin.none
             ]
+        core = Mixin.batch
+            [ o.mixin
+            , class "boundary_core"
+            , if not <| List.isEmpty o.overlays then
+                class "boundary_core-hasOverlays"
+              else
+                Mixin.none
+            , if o.enforcePointerEvent then
+                class "boundary_core-enforcePointerEvent"
+              else
+                Mixin.none
+            ]
     in
     case o.content of
         NoContent ->
@@ -1671,27 +1652,27 @@ renderBoundary renderer { inherit, self } o =
                 Mixin.lift (Html.node o.nodeName)
                     base
                     [ Mixin.div
-                        [ o.mixin
-                        , class "boundary_core"
+                        [ core
                         ]
                         [ Mixin.div
                             [ class "boundary_scroller"
                             , class "boundary_scroller-verticalScroll"
                             ]
-                            [ render_ renderer childMixin content
-                            ]
+                            ( render_ renderer childMixin content ::
+                                List.map (renderOverlay renderer) o.overlays
+                            )
                         ]
                     ]
             else
                 Mixin.lift (Html.node o.nodeName)
                     base
                     [ Mixin.div
-                        [ o.mixin
-                        , class "boundary_core"
+                        [ core
                         , class "boundary_core-view"
                         ]
-                        [ render_ renderer childMixin content
-                        ]
+                        ( render_ renderer childMixin content ::
+                            List.map (renderOverlay renderer) o.overlays
+                        )
                     ]
         TextContent texts ->
             Mixin.lift (Html.node o.nodeName)
@@ -1706,18 +1687,21 @@ renderBoundary renderer { inherit, self } o =
                                 [ Html.text inline.text
                                 ]
                         )
+                    |> (\children -> children ++
+                            List.map (renderOverlay renderer) o.overlays
+                       )
+
                     |> Mixin.div
-                        [ o.mixin
-                        , class "boundary_core"
+                        [ core
                         , class "boundary_core-text"
                         ]
                 ]
 
 
 
-boundaryCustomProperty : Renderer_ -> Boundary_ msg -> Mixin msg
-boundaryCustomProperty renderer o =
-    customProperty <|
+boundaryCustomProperty : Renderer_ -> List (String, String) -> Boundary_ msg -> Mixin msg
+boundaryCustomProperty renderer custom o =
+    customProperty <| custom ++
         [ ( "--outer-gap-x"
           , multipleBaseSize o.gap.horizontal renderer.baseSize
                   |> renderBaseSize
@@ -1938,6 +1922,39 @@ renderColumn renderer { inherit, self } o =
                     )
 
 
+
+renderOverlay : Renderer_ -> Overlay msg -> Html msg
+renderOverlay renderer overlay =
+    let
+        (Boundary boundary) = overlay.boundary
+        childMixin =
+            { inherit =
+                Mixin.batch
+                    [ class "heightFlex"
+                    , class "widthFlex"
+                    ]
+            , self = class "overlay"
+            }
+    in
+        { boundary
+            | height = FlexSize
+            , width = FlexSize
+        }
+            |> preprocessHeight
+            |> preprocessWidth
+            |> renderBoundary renderer childMixin
+                [ ( "--overlay-top", String.fromFloat overlay.area.top ++ "%")
+                , ( "--overlay-bottom", String.fromFloat overlay.area.bottom ++ "%")
+                , ( "--overlay-left", String.fromFloat overlay.area.left ++ "%")
+                , ( "--overlay-right", String.fromFloat overlay.area.right ++ "%")
+                , ( "--overlay-priority"
+                  , overlay.area.priority
+                    |> Maybe.map String.fromInt
+                    |> Maybe.withDefault "auto"
+                  )
+                ]
+
+
 class : String -> Mixin msg
 class str =
     Mixin.class <| "elmNeatLayout--" ++ str
@@ -1967,3 +1984,78 @@ setNodeName str (View view) =
         FromColumn column_ ->
             FromColumn { column_ | nodeName = str }
         None -> None
+
+
+-- Layer
+
+
+{-| Set the position of each edge of the overlay layer as a percentage of the base view.
+
+The `priority` field specifies how much the element is superimposed on the front side in preference to other elements. If given `Nothing`, it is set equivalent priority comparing to other elements.
+-}
+type alias Layer =
+    { top : Float
+    , bottom : Float
+    , left : Float
+    , right : Float
+    , priority : Maybe Int
+    }
+
+
+{-|
+
+    defaultLayer
+    --> { top = 0
+    --> , bottom = 0
+    --> , left = 0
+    --> , right = 0
+    --> , priority = Nothing
+    --> }
+
+-}
+defaultLayer : Layer
+defaultLayer =
+    { top = 0
+    , bottom = 0
+    , left = 0
+    , right = 0
+    , priority = Nothing
+    }
+
+
+
+{-| Put overlay layer on the parent view.
+-}
+putLayer : String -> ( Layer, Boundary (Layered msg) ) -> Boundary msg -> Boundary msg
+putLayer name ( area, layered ) (Boundary boundary) =
+    Boundary
+        { boundary
+            | overlays =
+                { name = name
+                , area = area
+                , boundary = mapBoundary (\(Layered a) -> a) layered
+                }
+                :: boundary.overlays
+        }
+
+
+{-| -}
+type Layered msg
+    = Layered msg
+
+
+{-| -}
+mapLayered : (a -> b) -> Boundary (Layered a) -> Boundary (Layered b)
+mapLayered f =
+    mapBoundary (\(Layered a) -> Layered <| f a)
+
+
+{-| Convert `Boundary` for `putLayer`. The `Boundary (Layered msg)` ignores pointer events; this feature is especially helpfull for realizing popups with clickable background.
+
+-}
+toLayered : Boundary msg -> Boundary (Layered msg)
+toLayered (Boundary boundary) =
+    Boundary
+        { boundary | enforcePointerEvent = True
+        }
+            |> mapBoundary Layered

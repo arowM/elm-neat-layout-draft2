@@ -27,7 +27,6 @@
 .elmNeatLayout {
   $prefix: &;
   $boundary: #{$prefix}--boundary;
-  $boundaryCore: #{$boundary}_core;
   $boundaryContent: #{$prefix}--boundaryContent;
   $row: #{$prefix}--row;
   $rowChild: #{$prefix}--rowChild;
@@ -71,54 +70,54 @@
   }
 
   &--boundary {
-    padding: calc(var(--outer-gap-y) / 2) calc(var(--outer-gap-x) / 2);
+    overflow: hidden;
 
-    & > #{$boundaryCore} {
-      overflow: hidden;
+    &-hasOverlays {
+      position: relative;
+    }
+
+    &-enforcePointerEvent {
+      pointer-events: auto;
+    }
+
+    & > #{$boundary}_scroller {
       height: 100%;
       width: 100%;
 
-      &-hasOverlays {
-        position: relative;
+      &-verticalScroll > #{$boundaryContent}::after {
+        display: block;
+        content: '';
+        padding-top: 0.02px;
       }
 
-      &-enforcePointerEvent {
-        pointer-events: auto;
-      }
-
-      & > #{$boundary}_scroller {
-        height: 100%;
-        width: 100%;
-
-        &-verticalScroll > #{$boundaryContent}::after {
-          display: block;
-          content: '';
-          padding-top: calc(var(--inner-gap-y) / 2);
-        }
-      }
-
-      &#{$boundaryCore}-view, &#{$boundaryCore} > #{$boundary}_scroller {
-        padding: calc(var(--inner-gap-y) / 2) calc(var(--inner-gap-x) / 2);
-      }
-
-      &#{$boundaryCore}-text {
-          margin: calc(var(--outer-gap-y) / -2) 0;
-
-        & > #{$boundaryCore}_text {
-          display: inline-block;
-          line-height: calc(1em + var(--outer-gap-y));
-        }
+      &-horizontalScroll > #{$boundaryContent}::after {
+        display: inline-block;
+        content: '';
+        padding-left: 0.02px;
       }
     }
 
-    &#{$prefix}--horizontalOverflow {
-      & > #{$boundaryCore} {
+    &-view, & > &_scroller {
+      padding: var(--inner-gap-y) var(--inner-gap-x);
+    }
+
+    &-text {
+        margin: calc(var(--outer-gap-y) / -2) 0;
+
+      & > #{$boundary}_text {
+        display: inline-block;
+        line-height: calc(1em + var(--outer-gap-y));
+      }
+    }
+
+    &-horizontalOverflow {
+      & > #{$boundary}_scroller {
         overflow-x: auto;
       }
     }
 
-    &#{$prefix}--verticalOverflow {
-      & > #{$boundaryCore} {
+    &-verticalOverflow {
+      & > #{$boundary}_scroller {
         overflow-y: auto;
       }
     }
@@ -126,6 +125,9 @@
 
   &--row {
     flex-wrap: nowrap;
+    display: flex;
+    flex-direction: row;
+    gap: var(--inner-gap-y) var(--inner-gap-x);
 
     &#{$row}-wrap {
       flex-wrap: wrap;
@@ -143,86 +145,38 @@
       justify-content: flex-end;
     }
 
-    &#{$widthFlex}, &#{$widthMaxSize} {
-      display: flex;
-      flex-direction: row;
+    & > #{$rowChild} {
+      width: auto;
+      flex-grow: 0;
+      flex-shrink: 0;
 
-      & > #{$rowChild} {
-        width: auto;
-        flex-grow: 0;
-        flex-shrink: 0;
-
-        &#{$rowChild}-grow {
-          flex-grow: 1;
-        }
-
-        &#{$boundary}#{$prefix}--horizontalOverflow {
-          flex-shrink: 1;
-          width: 0;
-
-          & > #{$boundaryCore} {
-            width: 100%;
-          }
-        }
-
-        &#{$rowChild}-alignStart {
-          align-self: flex-start;
-        }
-        &#{$rowChild}-alignCenter {
-          align-self: center;
-        }
-        &#{$rowChild}-alignEnd {
-          align-self: flex-end;
-        }
+      &#{$rowChild}-grow {
+        flex-grow: 1;
       }
-    }
 
-    &#{$widthMinSize} {
-      display: block;
+      &#{$boundary}-horizontalOverflow {
+        flex-shrink: 1;
+        width: 0;
+      }
 
-      & > #{$rowChild} {
-        width: auto;
-
-        &#{$row} {
-          &#{$widthFlex}, &#{$widthMaxSize} {
-            display: inline-flex;
-          }
-
-          &#{$widthMinSize} {
-            display: inline-block;
-          }
-        }
-
-        &#{$column} {
-          &#{$heightFlex}, &#{$heightMaxSize} {
-            display: inline-flex;
-          }
-
-          &#{$heightMinSize} {
-            display: inline-block;
-          }
-        }
-
-        &#{$boundary} {
-          display: inline-block;
-        }
-
-        &#{$rowChild}-alignStart {
-          margin-right: auto;
-        }
-
-        &#{$rowChild}-alignCenter {
-          margin: 0 auto;
-        }
-
-        &#{$rowChild}-alignEnd {
-          margin-left: auto;
-        }
+      &#{$rowChild}-alignStart {
+        align-self: flex-start;
+      }
+      &#{$rowChild}-alignCenter {
+        align-self: center;
+      }
+      &#{$rowChild}-alignEnd {
+        align-self: flex-end;
       }
     }
   }
 
   &--column {
+    flex-wrap: nowrap;
+    display: flex;
+    flex-direction: column;
+    gap: var(--inner-gap-y) var(--inner-gap-x);
+
     &#{$column}-justifyStart {
       justify-content: flex-start;
     }
@@ -233,57 +187,28 @@
       justify-content: flex-end;
     }
 
-    &#{$heightFlex}, &#{$heightMaxSize} {
-      display: flex;
-      flex-direction: column;
+    & > #{$columnChild} {
+      height: auto;
+      flex-grow: 0;
+      flex-shrink: 0;
 
-      & > #{$columnChild} {
-        height: auto;
-        flex-grow: 0;
-        flex-shrink: 0;
-
-        &#{$columnChild}-grow {
-          flex-grow: 1;
-        }
-
-        &#{$boundary}#{$prefix}--verticalOverflow {
-          flex-shrink: 1;
-          height: 0;
-
-          & > #{$boundaryCore} {
-            height: 100%;
-          }
-        }
-
-        &#{$columnChild}-alignStart {
-          align-self: flex-start;
-        }
-        &#{$columnChild}-alignCenter {
-          align-self: center;
-        }
-        &#{$columnChild}-alignEnd {
-          align-self: flex-end;
-        }
+      &#{$columnChild}-grow {
+        flex-grow: 1;
       }
-    }
 
-    &#{$heightMinSize} {
-      display: block;
+      &#{$boundary}-verticalOverflow {
+        flex-shrink: 1;
+        height: 0;
+      }
 
-      & > #{$columnChild} {
-        height: auto;
-
-        &#{$columnChild}-alignStart {
-          margin-right: auto;
-        }
-
-        &#{$columnChild}-alignCenter {
-          margin: 0 auto;
-        }
-
-        &#{$columnChild}-alignEnd {
-          margin-left: auto;
-        }
+      &#{$columnChild}-alignStart {
+        align-self: flex-start;
+      }
+      &#{$columnChild}-alignCenter {
+        align-self: center;
+      }
+      &#{$columnChild}-alignEnd {
+        align-self: flex-end;
       }
     }
   }
@@ -293,29 +218,29 @@
     width: 100%;
 
     &#{$boundary}#{$heightFlex} {
-      max-height: calc(var(--max-height) + var(--outer-gap-y));
+      max-height: var(--max-height);
     }
 
     &#{$boundary}#{$heightMaxSize} {
-      height: calc(var(--max-height) + var(--outer-gap-y));
+      height: var(--max-height);
     }
 
     &#{$boundary}#{$heightMinSize} {
       height: auto;
-      min-height: calc(var(--min-height) + var(--outer-gap-y));
+      min-height: var(--min-height);
     }
 
     &#{$boundary}#{$widthFlex} {
-      max-width: calc(var(--max-width) + var(--outer-gap-x));
+      max-width: var(--max-width);
     }
 
     &#{$boundary}#{$widthMaxSize} {
-      width: calc(var(--max-width) + var(--outer-gap-x));
+      width: var(--max-width);
     }
 
     &#{$boundary}#{$widthMinSize} {
       width: auto;
-      min-width: calc(var(--min-width) + var(--outer-gap-x));
+      min-width: var(--min-width);
     }
   }
 
@@ -327,78 +252,44 @@
   &--boundary {
     &#{$rowChild}, &#{$columnChild} {
       &#{$heightFlex} {
-        min-height: calc(var(--min-height) + var(--outer-gap-y));
+        min-height: var(--min-height);
 
         &#{$boundary}-hasMaxHeight {
-          max-height: calc(var(--max-height) + var(--outer-gap-y));
-
-          & > #{$boundaryCore} {
-            max-height: var(--max-height);
-          }
+          max-height: var(--max-height);
         }
       }
 
       &#{$widthFlex} {
-        min-width: calc(var(--min-width) + var(--outer-gap-x));
+        min-width: var(--min-width);
 
         &#{$boundary}-hasMaxWidth {
-          max-width: calc(var(--max-width) + var(--outer-gap-x));
-
-          & > #{$boundaryCore} {
-            max-width: var(--max-width);
-          }
+          max-width: var(--max-width);
         }
       }
 
       &#{$heightMaxSize}#{$boundary}-hasMaxHeight {
-        height: calc(var(--max-height) + var(--outer-gap-y));
-
-        & > #{$boundaryCore} {
-          height: var(--max-height);
-        }
+        height: var(--max-height);
       }
 
       &#{$widthMaxSize}#{$boundary}-hasMaxWidth {
-        width: calc(var(--max-width) + var(--outer-gap-x));
-
-        & > #{$boundaryCore} {
-          width: var(--max-width);
-        }
+        width: var(--max-width);
       }
 
       &#{$heightMinSize}#{$boundary} {
         height: auto;
-        min-height: calc(var(--min-height) + var(--outer-gap-y));
+        min-height: var(--min-height);
 
-        & > #{$boundaryCore} {
-          height: auto;
-          min-height: var(--min-height);
-        }
-
-        &#{$prefix}--verticalOverflow {
-          height: calc(var(--min-height) + var(--outer-gap-y));
-
-          & > #{$boundaryCore} {
-            height: var(--min-height);
-          }
+        &-verticalOverflow {
+          height: var(--min-height);
         }
       }
 
       &#{$widthMinSize}#{$boundary} {
         width: auto;
-        min-width: calc(var(--min-width) + var(--outer-gap-x));
+        min-width: var(--min-width);
 
-        & > #{$boundaryCore} {
-          width: auto;
-          min-width: var(--min-width);
-        }
-
-        &#{$prefix}--horizontalOverflow {
-          width: calc(var(--min-width) + var(--outer-gap-x));
-
-          & > #{$boundaryCore} {
-            width: var(--min-width);
-          }
+        &-horizontalOverflow {
+          width: var(--min-width);
         }
       }
     }

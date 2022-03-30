@@ -1603,16 +1603,18 @@ renderBoundary renderer { inherit, self } o =
             , self = class "boundaryContent"
             }
         base =
-            [ boundaryCustomProperty renderer o
+            Mixin.batch
+            [ o.mixin
+            , boundaryCustomProperty renderer o
             , childMixin.inherit
             , self
             , class "boundary"
             , if o.horizontalOverflow then
-                class "horizontalOverflow"
+                class "boundary-horizontalOverflow"
               else
                 Mixin.none
             , if o.verticalOverflow then
-                class "verticalOverflow"
+                class "boundary-verticalOverflow"
               else
                 Mixin.none
             , if o.maxHeight /= MaxHeightNone then
@@ -1623,16 +1625,12 @@ renderBoundary renderer { inherit, self } o =
                 class "boundary-hasMaxWidth"
               else
                 Mixin.none
-            ]
-        core = Mixin.batch
-            [ o.mixin
-            , class "boundary_core"
             , if not <| List.isEmpty o.overlays then
-                class "boundary_core-hasOverlays"
+                class "boundary-hasOverlays"
               else
                 Mixin.none
             , if o.enforcePointerEvent then
-                class "boundary_core-enforcePointerEvent"
+                class "boundary-enforcePointerEvent"
               else
                 Mixin.none
             ]
@@ -1643,39 +1641,31 @@ renderBoundary renderer { inherit, self } o =
         ViewContent content ->
             if o.verticalOverflow && o.innerGap.vertical /= 0 then
                 Mixin.lift (Html.node o.nodeName)
-                    base
-                    [ Mixin.div
-                        [ core
-                        ]
-                        [ Mixin.div
-                            [ class "boundary_scroller"
-                            , class "boundary_scroller-verticalScroll"
-                            ]
-                            ( render_ renderer childMixin content ::
-                                List.map (renderOverlay renderer) o.overlays
-                            )
-                        ]
+                    [ base
                     ]
-            else
-                Mixin.lift (Html.node o.nodeName)
-                    base
                     [ Mixin.div
-                        [ core
-                        , class "boundary_core-view"
+                        [ class "boundary_scroller"
+                        , class "boundary_scroller-verticalScroll"
                         ]
                         ( render_ renderer childMixin content ::
                             List.map (renderOverlay renderer) o.overlays
                         )
                     ]
+            else
+                Mixin.lift (Html.node o.nodeName)
+                    [ base
+                    , class "boundary-view"
+                    ]
+                    ( render_ renderer childMixin content ::
+                        List.map (renderOverlay renderer) o.overlays
+                    )
         TextContent texts ->
-            Mixin.lift (Html.node o.nodeName)
-                base
-                [ texts
+                texts
                     |> List.map
                         (\inline ->
                             Mixin.lift (Html.node inline.nodeName)
                                 [ inline.mixin
-                                , class "boundary_core_text"
+                                , class "boundary_text"
                                 ]
                                 [ Html.text inline.text
                                 ]
@@ -1683,12 +1673,10 @@ renderBoundary renderer { inherit, self } o =
                     |> (\children -> children ++
                             List.map (renderOverlay renderer) o.overlays
                        )
-
-                    |> Mixin.div
-                        [ core
-                        , class "boundary_core-text"
+                    |> Mixin.lift (Html.node o.nodeName)
+                        [ base
+                        , class "boundary-text"
                         ]
-                ]
 
 
 

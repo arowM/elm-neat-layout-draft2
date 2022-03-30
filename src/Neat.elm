@@ -1083,7 +1083,7 @@ setMixins ls =
 -}
 setAttribute : Attribute msg -> Boundary msg -> Boundary msg
 setAttribute attr =
-    setMixin <| Mixin.fromAttribute attr
+    setMixin <| Mixin.fromAttributes [ attr ]
 
 
 {-| Same as `setAttribute` but takes a list of `Attribute`s.
@@ -1132,14 +1132,7 @@ i.e.,
 -}
 setBoolAria : String -> Bool -> View g msg -> View g msg
 setBoolAria name g =
-    setAria name <|
-        if g then
-            "true"
-
-        else
-            "false"
-
-
+    setViewMixin (Mixin.boolAttribute ("aria-" ++ name) g)
 
 
 -- Sizing
@@ -1408,7 +1401,7 @@ render (Renderer renderer) (Boundary boundary) =
         }
             |> preprocessHeight
             |> preprocessWidth
-            |> renderBoundary renderer childMixin []
+            |> renderBoundary renderer childMixin
 
 
 preprocessHeight : Boundary_ msg -> Boundary_ msg
@@ -1578,7 +1571,7 @@ render_ : Renderer_
 render_ renderer childMixin view =
     case view of
         FromBoundary o ->
-            renderBoundary renderer childMixin [] o
+            renderBoundary renderer childMixin o
 
         FromRow o ->
             renderRow renderer childMixin o
@@ -1590,8 +1583,8 @@ render_ renderer childMixin view =
             Html.text ""
 
 
-renderBoundary : Renderer_ -> ChildMixin msg -> List (String, String) -> Boundary_ msg -> Html msg
-renderBoundary renderer { inherit, self } custom o =
+renderBoundary : Renderer_ -> ChildMixin msg -> Boundary_ msg -> Html msg
+renderBoundary renderer { inherit, self } o =
     let
         childMixin =
             { inherit =
@@ -1610,7 +1603,7 @@ renderBoundary renderer { inherit, self } custom o =
             , self = class "boundaryContent"
             }
         base =
-            [ boundaryCustomProperty renderer custom o
+            [ boundaryCustomProperty renderer o
             , childMixin.inherit
             , self
             , class "boundary"
@@ -1699,81 +1692,72 @@ renderBoundary renderer { inherit, self } custom o =
 
 
 
-boundaryCustomProperty : Renderer_ -> List (String, String) -> Boundary_ msg -> Mixin msg
-boundaryCustomProperty renderer custom o =
-    customProperty <| custom ++
-        [ ( "--outer-gap-x"
-          , multipleBaseSize o.gap.horizontal renderer.baseSize
+boundaryCustomProperty : Renderer_ -> Boundary_ msg -> Mixin msg
+boundaryCustomProperty renderer o =
+    Mixin.batch
+        [ Mixin.style "--outer-gap-x"
+          ( multipleBaseSize o.gap.horizontal renderer.baseSize
                   |> renderBaseSize
           )
-        , ( "--outer-gap-y"
-          , multipleBaseSize o.gap.vertical renderer.baseSize
+        , Mixin.style "--outer-gap-y"
+          ( multipleBaseSize o.gap.vertical renderer.baseSize
                   |> renderBaseSize
           )
-        , ( "--inner-gap-x"
-          , multipleBaseSize o.innerGap.horizontal renderer.baseSize
+        , Mixin.style "--inner-gap-x"
+          ( multipleBaseSize o.innerGap.horizontal renderer.baseSize
                   |> renderBaseSize
           )
-        , ( "--inner-gap-y"
-          , multipleBaseSize o.innerGap.vertical renderer.baseSize
+        , Mixin.style "--inner-gap-y"
+          ( multipleBaseSize o.innerGap.vertical renderer.baseSize
                   |> renderBaseSize
           )
-        ] ++ List.concat
-            [ case o.minWidth of
-                MinWidthInBs bs ->
-                    [ ( "--min-width"
-                      , multipleBaseSize bs renderer.baseSize
-                        |> renderBaseSize
-                      )
-                    ]
-                MinWidthInUnit unit v ->
-                    [ ( "--min-width"
-                      , String.fromFloat v ++ unit
-                      )
-                    ]
-            , case o.maxWidth of
-                MaxWidthInBs bs ->
-                    [ ( "--max-width"
-                      , multipleBaseSize bs renderer.baseSize
-                        |> renderBaseSize
-                      )
-                    ]
+        , case o.minWidth of
+            MinWidthInBs bs ->
+                Mixin.style "--min-width"
+                  ( multipleBaseSize bs renderer.baseSize
+                    |> renderBaseSize
+                  )
+            MinWidthInUnit unit v ->
+                Mixin.style "--min-width"
+                  ( String.fromFloat v ++ unit
+                  )
+        , case o.maxWidth of
+            MaxWidthInBs bs ->
+                Mixin.style "--max-width"
+                  ( multipleBaseSize bs renderer.baseSize
+                    |> renderBaseSize
+                  )
 
-                MaxWidthInUnit unit v ->
-                    [ ( "--max-width"
-                      , String.fromFloat v ++ unit
-                      )
-                    ]
-                _ ->
-                    []
-            , case o.minHeight of
-                MinHeightInBs bs ->
-                    [ ( "--min-height"
-                      , multipleBaseSize bs renderer.baseSize
-                        |> renderBaseSize
-                      )
-                    ]
-                MinHeightInUnit unit v ->
-                    [ ( "--min-height"
-                      , String.fromFloat v ++ unit
-                      )
-                    ]
-            , case o.maxHeight of
-                MaxHeightInBs bs ->
-                    [ ( "--max-height"
-                      , multipleBaseSize bs renderer.baseSize
-                        |> renderBaseSize
-                      )
-                    ]
+            MaxWidthInUnit unit v ->
+                Mixin.style "--max-width"
+                  ( String.fromFloat v ++ unit
+                  )
+            _ ->
+                Mixin.none
+        , case o.minHeight of
+            MinHeightInBs bs ->
+                Mixin.style "--min-height"
+                  ( multipleBaseSize bs renderer.baseSize
+                    |> renderBaseSize
+                  )
+            MinHeightInUnit unit v ->
+                Mixin.style "--min-height"
+                  ( String.fromFloat v ++ unit
+                  )
+        , case o.maxHeight of
+            MaxHeightInBs bs ->
+                Mixin.style "--max-height"
+                  ( multipleBaseSize bs renderer.baseSize
+                    |> renderBaseSize
+                  )
 
-                MaxHeightInUnit unit v ->
-                    [ ( "--max-height"
-                      , String.fromFloat v ++ unit
-                      )
-                    ]
-                _ ->
-                    []
-            ]
+            MaxHeightInUnit unit v ->
+                Mixin.style "--max-height"
+                  ( String.fromFloat v ++ unit
+                  )
+            _ ->
+                Mixin.none
+        ]
 
 
 renderRow : Renderer_ -> ChildMixin msg -> Row_ msg -> Html msg
@@ -1828,12 +1812,10 @@ renderRow renderer { inherit, self } o =
     in
     case o.children of
         Children item [] ->
-            Keyed.node o.nodeName
-                (Mixin.toAttributes <| Mixin.batch
-                    [ base
-                    , class "row-single"
-                    ]
-                )
+            Mixin.keyed o.nodeName
+                [ base
+                , class "row-single"
+                ]
                 [ (item.key, render_ renderer (childMixin item) item.content)
                 ]
 
@@ -1843,12 +1825,10 @@ renderRow renderer { inherit, self } o =
                     (\item ->
                         (item.key, render_ renderer (childMixin item) item.content)
                     )
-                |> Keyed.node o.nodeName
-                    (Mixin.toAttributes <| Mixin.batch
-                        [ base
-                        , class "row-multi"
-                        ]
-                    )
+                |> Mixin.keyed o.nodeName
+                    [ base
+                    , class "row-multi"
+                    ]
 
 
 renderColumn : Renderer_ -> ChildMixin msg -> Column_ msg -> Html msg
@@ -1899,12 +1879,10 @@ renderColumn renderer { inherit, self } o =
     in
     case o.children of
         Children item [] ->
-            Keyed.node o.nodeName
-                (Mixin.toAttributes <| Mixin.batch
-                    [ base
-                    , class "column-single"
-                    ]
-                )
+            Mixin.keyed o.nodeName
+                [ base
+                , class "column-single"
+                ]
                 [ (item.key, render_ renderer (childMixin item) item.content)
                 ]
 
@@ -1914,12 +1892,10 @@ renderColumn renderer { inherit, self } o =
                     (\item ->
                         (item.key, render_ renderer (childMixin item) item.content)
                     )
-                |> Keyed.node o.nodeName
-                    (Mixin.toAttributes <| Mixin.batch
-                        [ base
-                        , class "column-multi"
-                        ]
-                    )
+                |> Mixin.keyed o.nodeName
+                    [ base
+                    , class "column-multi"
+                    ]
 
 
 
@@ -1933,7 +1909,19 @@ renderOverlay renderer overlay =
                     [ class "heightFlex"
                     , class "widthFlex"
                     ]
-            , self = class "overlay"
+            , self =
+                Mixin.batch
+                    [ class "overlay"
+                    , Mixin.style "--overlay-top" ( String.fromFloat overlay.area.top ++ "%")
+                    , Mixin.style "--overlay-bottom" ( String.fromFloat overlay.area.bottom ++ "%")
+                    , Mixin.style "--overlay-left" ( String.fromFloat overlay.area.left ++ "%")
+                    , Mixin.style "--overlay-right" ( String.fromFloat overlay.area.right ++ "%")
+                    , Mixin.style "--overlay-priority"
+                      ( overlay.area.priority
+                        |> Maybe.map String.fromInt
+                        |> Maybe.withDefault "auto"
+                      )
+                    ]
             }
     in
         { boundary
@@ -1943,31 +1931,11 @@ renderOverlay renderer overlay =
             |> preprocessHeight
             |> preprocessWidth
             |> renderBoundary renderer childMixin
-                [ ( "--overlay-top", String.fromFloat overlay.area.top ++ "%")
-                , ( "--overlay-bottom", String.fromFloat overlay.area.bottom ++ "%")
-                , ( "--overlay-left", String.fromFloat overlay.area.left ++ "%")
-                , ( "--overlay-right", String.fromFloat overlay.area.right ++ "%")
-                , ( "--overlay-priority"
-                  , overlay.area.priority
-                    |> Maybe.map String.fromInt
-                    |> Maybe.withDefault "auto"
-                  )
-                ]
 
 
 class : String -> Mixin msg
 class str =
     Mixin.class <| "elmNeatLayout--" ++ str
-
-
-{-| Dangerous work around. It overwrites `Attribtes.style`.
--}
-customProperty : List (String, String) -> Mixin msg
-customProperty kvs =
-    kvs
-        |> List.foldl (\(k, v) acc -> acc ++ k ++ ":" ++ v ++ ";") ""
-        |> Attributes.attribute "style"
-        |> Mixin.fromAttribute
 
 
 -- Low level function for HTML

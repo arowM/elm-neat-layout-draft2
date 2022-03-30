@@ -124,8 +124,8 @@ setMixins mixins node =
 
 {-| -}
 setAttribute : Attribute msg -> Text msg -> Text msg
-setAttribute =
-    setMixin << Mixin.fromAttribute
+setAttribute attr =
+    setMixin <| Mixin.fromAttributes [ attr ]
 
 
 {-| -}

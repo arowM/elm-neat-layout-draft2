@@ -3,7 +3,6 @@ module Gap exposing
     , body
     )
 
-
 {-|
 
 @docs Body
@@ -15,7 +14,8 @@ import Neat exposing (IsGap(..))
 
 
 {-| -}
-type Body = Body
+type Body
+    = Body
 
 
 {-| -}

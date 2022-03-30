@@ -1,23 +1,43 @@
 module Neat exposing
     ( View
     , map
-    , NoGap
-    , noGap
     , Boundary
     , mapBoundary
+    , NoGap
+    , noGap
+    , render
     , Renderer
     , defaultRenderer
     , setBaseSizeInRem
-    , render
     , textBlock
     , fromTexts
     , empty
     , none
-    -- , scalableBlock
-    -- , textarea
-    -- , input
-    -- , select
-    -- , Options
+    , setMixin
+    , setMixins
+    , setAttribute
+    , setAttributes
+    , setRole
+    , setAria
+    , setBoolAria
+    , setMinWidthInBs
+    , setMinWidthInEm
+    , setMinWidthInRem
+    , setMinHeightInBs
+    , setMinHeightInEm
+    , setMinHeightInRem
+    , setMaxWidthInfinite
+    , setMaxWidthInBs
+    , setMaxWidthInEm
+    , setMaxWidthInRem
+    , setMaxHeightInfinite
+    , setMaxHeightInBs
+    , setMaxHeightInEm
+    , setMaxHeightInRem
+    , enableVerticalScroll
+    , enableHorizontalScroll
+    , setGap
+    , setBoundary
     , row
     , Row
     , defaultRow
@@ -41,54 +61,33 @@ module Neat exposing
     , grownLeftItem
     , grownCenterItem
     , grownRightItem
-    , setMixin
-    , setMixins
-    , setAttribute
-    , setAttributes
-    , setRole
-    , setAria
-    , setBoolAria
-    , setMinWidthInBs
-    , setMinWidthInEm
-    , setMinWidthInRem
-    , setMinHeightInBs
-    , setMinHeightInEm
-    , setMinHeightInRem
-    , setMaxWidthInfinite
-    , setMaxWidthInBs
-    , setMaxWidthInEm
-    , setMaxWidthInRem
-    , setMaxHeightInfinite
-    , setMaxHeightInBs
-    , setMaxHeightInEm
-    , setMaxHeightInRem
-    , setGap
-    , setBoundary
-    , enableVerticalScroll
-    , enableHorizontalScroll
     , putLayer
     , Layer
     , defaultLayer
     , Layered
     , mapLayered
     , toLayered
-    -- , when
-    -- , unless
-    -- , withMaybe
-    -- , applyWhen
-    -- , applyUnless
-    -- , applyWithMaybe
+    , when
+    , unless
+    , withMaybe
+    , applyWhen
+    , applyUnless
+    , applyWithMaybe
     , IsGap(..)
     , Gap
     , setNodeName
+    , ColumnItem, RowItem
     )
 
 {-| Main module for elm-neat-layout.
+
 
 # Core
 
 @docs View
 @docs map
+@docs Boundary
+@docs mapBoundary
 @docs NoGap
 @docs noGap
 
@@ -107,15 +106,6 @@ module Neat exposing
 @docs fromTexts
 @docs empty
 @docs none
--- @docs scalableBlock
-
-
-# Special constructors
-
--- @docs textarea
--- @docs input
--- @docs select
--- @docs Options
 
 
 # Attributes
@@ -202,14 +192,23 @@ The initial value for maximum height is _fit_, which shrinks as much as its chil
 @docs setMaxHeightInEm
 @docs setMaxHeightInRem
 
+
+# Scroll
+
+@docs enableVerticalScroll
+@docs enableHorizontalScroll
+
+
 # Gaps
 
 @docs setGap
 @docs setBoundary
 
+
 # Row
 
 @docs row
+
 
 ## Config
 
@@ -218,6 +217,7 @@ The initial value for maximum height is _fit_, which shrinks as much as its chil
 @docs enableWrap
 @docs alignCenter
 @docs alignRight
+
 
 ## Item
 
@@ -230,9 +230,11 @@ Each function has the `String` argument, which helps make the DOM modifications 
 @docs grownMiddleItem
 @docs grownBottomItem
 
+
 # Column
 
 @docs column
+
 
 ## Config
 
@@ -240,6 +242,7 @@ Each function has the `String` argument, which helps make the DOM modifications 
 @docs defaultColumn
 @docs alignMiddle
 @docs alignBottom
+
 
 ## Item
 
@@ -251,6 +254,7 @@ Each function has the `String` argument, which helps make the DOM modifications 
 @docs grownLeftItem
 @docs grownCenterItem
 @docs grownRightItem
+
 
 # Overlay
 
@@ -298,19 +302,11 @@ You can use custom gaps just by declaring new types and `IsGap` values for them.
 
 -}
 
-
-import Browser exposing (UrlRequest)
-import Browser.Navigation exposing (Key)
-import Dict exposing (Dict)
 import Html exposing (Attribute, Html)
-import Html.Attributes as Attributes
-import Html.Keyed as Keyed
 import Mixin exposing (Mixin)
 import Mixin.Html as Mixin
 import Neat.Text as Text exposing (Text)
-import Neat.Text.Internal exposing (InlineNode)
-import Neat.Text as Text exposing (Text)
-import Neat.Text.Internal exposing (InlineNode)
+
 
 
 -- Core
@@ -335,6 +331,7 @@ type View_ msg
 {-| A bounded View without gap.
 
 Convert to/from View by `setGap`/`setBoundary`.
+
 -}
 type Boundary msg
     = Boundary (Boundary_ msg)
@@ -384,6 +381,7 @@ defaultBoundary =
     , enforcePointerEvent = False
     }
 
+
 type Size
     = MinSize
     | FlexSize
@@ -419,7 +417,6 @@ defaultRow_ children =
     , width = FlexSize
     , height = FlexSize
     }
-
 
 
 type alias Column_ msg =
@@ -472,13 +469,14 @@ type Children msg
 
 
 {-| -}
-type RowItem gap msg =
-    RowItem (Item_ msg)
+type RowItem gap msg
+    = RowItem (Item_ msg)
 
 
 {-| -}
-type ColumnItem gap msg =
-    ColumnItem (Item_ msg)
+type ColumnItem gap msg
+    = ColumnItem (Item_ msg)
+
 
 type alias Item_ msg =
     { alignSelf : Alignment
@@ -491,133 +489,146 @@ type alias Item_ msg =
 {-| Top-aligned item.
 -}
 topItem : String -> View gap msg -> RowItem gap msg
-topItem key (View content) = RowItem
-    { alignSelf = AlignStart
-    , grow = False
-    , key = key
-    , content = content
-    }
+topItem key (View content) =
+    RowItem
+        { alignSelf = AlignStart
+        , grow = False
+        , key = key
+        , content = content
+        }
 
 
 {-| Top-aligned item which grows its width as much as possible.
 -}
 grownTopItem : String -> View gap msg -> RowItem gap msg
-grownTopItem key (View content) = RowItem
-    { alignSelf = AlignStart
-    , grow = True
-    , key = key
-    , content = content
-    }
+grownTopItem key (View content) =
+    RowItem
+        { alignSelf = AlignStart
+        , grow = True
+        , key = key
+        , content = content
+        }
 
 
 {-| Vertically centered item.
 -}
 middleItem : String -> View gap msg -> RowItem gap msg
-middleItem key (View content) = RowItem
-    { alignSelf = AlignCenter
-    , grow = False
-    , key = key
-    , content = content
-    }
+middleItem key (View content) =
+    RowItem
+        { alignSelf = AlignCenter
+        , grow = False
+        , key = key
+        , content = content
+        }
 
 
 {-| Vertically centered item which grows its width as much as possible.
 -}
 grownMiddleItem : String -> View gap msg -> RowItem gap msg
-grownMiddleItem key (View content) = RowItem
-    { alignSelf = AlignCenter
-    , grow = True
-    , key = key
-    , content = content
-    }
+grownMiddleItem key (View content) =
+    RowItem
+        { alignSelf = AlignCenter
+        , grow = True
+        , key = key
+        , content = content
+        }
 
 
 {-| Bottom-aligned item.
 -}
 bottomItem : String -> View gap msg -> RowItem gap msg
-bottomItem key (View content) = RowItem
-    { alignSelf = AlignEnd
-    , grow = False
-    , key = key
-    , content = content
-    }
+bottomItem key (View content) =
+    RowItem
+        { alignSelf = AlignEnd
+        , grow = False
+        , key = key
+        , content = content
+        }
 
 
 {-| Bottom-aligned item which grows its width as much as possible.
 -}
 grownBottomItem : String -> View gap msg -> RowItem gap msg
-grownBottomItem key (View content) = RowItem
-    { alignSelf = AlignEnd
-    , grow = True
-    , key = key
-    , content = content
-    }
+grownBottomItem key (View content) =
+    RowItem
+        { alignSelf = AlignEnd
+        , grow = True
+        , key = key
+        , content = content
+        }
 
 
 {-| Left-aligned item.
 -}
 leftItem : String -> View gap msg -> ColumnItem gap msg
-leftItem key (View content) = ColumnItem
-    { alignSelf = AlignStart
-    , grow = False
-    , key = key
-    , content = content
-    }
+leftItem key (View content) =
+    ColumnItem
+        { alignSelf = AlignStart
+        , grow = False
+        , key = key
+        , content = content
+        }
 
 
 {-| Left-aligned item which grows its height as much as possible.
 -}
 grownLeftItem : String -> View gap msg -> ColumnItem gap msg
-grownLeftItem key (View content) = ColumnItem
-    { alignSelf = AlignStart
-    , grow = True
-    , key = key
-    , content = content
-    }
+grownLeftItem key (View content) =
+    ColumnItem
+        { alignSelf = AlignStart
+        , grow = True
+        , key = key
+        , content = content
+        }
 
 
 {-| Horizontally centered item.
 -}
 centerItem : String -> View gap msg -> ColumnItem gap msg
-centerItem key (View content) = ColumnItem
-    { alignSelf = AlignCenter
-    , grow = False
-    , key = key
-    , content = content
-    }
+centerItem key (View content) =
+    ColumnItem
+        { alignSelf = AlignCenter
+        , grow = False
+        , key = key
+        , content = content
+        }
 
 
 {-| Horizontally centered item which grows its height as much as possible.
 -}
 grownCenterItem : String -> View gap msg -> ColumnItem gap msg
-grownCenterItem key (View content) = ColumnItem
-    { alignSelf = AlignCenter
-    , grow = True
-    , key = key
-    , content = content
-    }
+grownCenterItem key (View content) =
+    ColumnItem
+        { alignSelf = AlignCenter
+        , grow = True
+        , key = key
+        , content = content
+        }
 
 
 {-| Right-aligned item.
 -}
 rightItem : String -> View gap msg -> ColumnItem gap msg
-rightItem key (View content) = ColumnItem
-    { alignSelf = AlignEnd
-    , grow = False
-    , key = key
-    , content = content
-    }
+rightItem key (View content) =
+    ColumnItem
+        { alignSelf = AlignEnd
+        , grow = False
+        , key = key
+        , content = content
+        }
 
 
 {-| Right-aligned item which grows its height as much as possible.
 -}
 grownRightItem : String -> View gap msg -> ColumnItem gap msg
-grownRightItem key (View content) = ColumnItem
-    { alignSelf = AlignEnd
-    , grow = True
-    , key = key
-    , content = content
-    }
+grownRightItem key (View content) =
+    ColumnItem
+        { alignSelf = AlignEnd
+        , grow = True
+        , key = key
+        , content = content
+        }
+
 
 modifyChild : (View_ a -> View_ b) -> Children a -> Children b
 modifyChild f (Children item0 items) =
@@ -630,8 +641,8 @@ modifyChild f (Children item0 items) =
             , content = f item.content
             }
     in
-            List.map modifyContent items
-                |> Children (modifyContent item0)
+    List.map modifyContent items
+        |> Children (modifyContent item0)
 
 
 {-| -}
@@ -700,13 +711,16 @@ mapBoundary_ f o =
     , minHeight = o.minHeight
     , maxHeight = o.maxHeight
     , verticalOverflow = o.verticalOverflow
-    , content = case o.content of
-        TextContent texts ->
-            TextContent <| List.map (Text.map f) texts
-        ViewContent view ->
-            ViewContent <| map_ f view
-        NoContent ->
-            NoContent
+    , content =
+        case o.content of
+            TextContent texts ->
+                TextContent <| List.map (Text.map f) texts
+
+            ViewContent view ->
+                ViewContent <| map_ f view
+
+            NoContent ->
+                NoContent
     , enforcePointerEvent = o.enforcePointerEvent
     }
 
@@ -714,10 +728,17 @@ mapBoundary_ f o =
 extractGap : View_ msg -> Gap
 extractGap view =
     case view of
-        FromBoundary o -> o.gap
-        FromRow o -> o.gap
-        FromColumn o -> o.gap
-        None -> emptyGap
+        FromBoundary o ->
+            o.gap
+
+        FromRow o ->
+            o.gap
+
+        FromColumn o ->
+            o.gap
+
+        None ->
+            emptyGap
 
 
 {-| A primitive type that represents that there is no Gap
@@ -742,6 +763,7 @@ emptyGap =
     }
 
 
+
 -- Custom gaps
 
 
@@ -764,15 +786,9 @@ type alias Gap =
     }
 
 
-subtractGap : Gap -> Gap -> Gap
-subtractGap g2 g1 =
-    { horizontal = g1.horizontal - g2.horizontal
-    , vertical = g1.vertical - g2.vertical
-    }
-
-
 
 -- `Browser.*` alternatives
+
 
 {-| Settings for rendering `View`.
 -}
@@ -840,6 +856,7 @@ defaultRenderer_ =
     }
 
 
+
 -- Primitive nodes
 
 
@@ -854,7 +871,6 @@ textBlock str =
     fromTexts
         [ Text.fromString str
         ]
-
 
 
 {-| An empty block.
@@ -895,17 +911,20 @@ In contrast, the `View` generated by the following code will be broken as follow
 | d e f |
 
 The line spacing width when the text is broken is the same as the Gap height applied by the `setGap` function.
+
 -}
 fromTexts : List (Text msg) -> Boundary msg
 fromTexts ls =
     let
-        texts = List.filter (\a -> a.text /= "") ls
+        texts =
+            List.filter (\a -> a.text /= "") ls
     in
     Boundary
         { defaultBoundary
             | content =
                 if List.isEmpty texts then
                     NoContent
+
                 else
                     TextContent texts
         }
@@ -923,6 +942,7 @@ none =
 type Row
     = Row RowConfig
 
+
 type alias RowConfig =
     { justify : Alignment
     , wrap : Bool
@@ -931,15 +951,16 @@ type alias RowConfig =
 
 {-| Default setting for rows.
 
-* horizontal alignment: left
-* wrapping: disabled
+  - horizontal alignment: left
+  - wrapping: disabled
 
 -}
 defaultRow : Row
-defaultRow = Row
-    { justify = AlignStart
-    , wrap = False
-    }
+defaultRow =
+    Row
+        { justify = AlignStart
+        , wrap = False
+        }
 
 
 {-| -}
@@ -967,6 +988,7 @@ enableWrap (Row config) =
 type Column
     = Column ColumnConfig
 
+
 type alias ColumnConfig =
     { justify : Alignment
     }
@@ -974,13 +996,14 @@ type alias ColumnConfig =
 
 {-| Default setting for columns.
 
-* vertical alignment: top
+  - vertical alignment: top
 
 -}
 defaultColumn : Column
-defaultColumn = Column
-    { justify = AlignStart
-    }
+defaultColumn =
+    Column
+        { justify = AlignStart
+        }
 
 
 {-| -}
@@ -997,7 +1020,6 @@ alignBottom (Column config) =
         { config | justify = AlignEnd }
 
 
-
 {-| Align children horizontally.
 -}
 row : Row -> List (RowItem gap msg) -> View gap msg
@@ -1009,6 +1031,7 @@ row (Row { justify, wrap }) children_ =
                     (\(RowItem item) ->
                         if item.content == None then
                             Nothing
+
                         else
                             Just item
                     )
@@ -1018,9 +1041,10 @@ row (Row { justify, wrap }) children_ =
             [] ->
                 None
 
-            (item :: items) ->
+            item :: items ->
                 let
-                    row_ = defaultRow_ (Children item items)
+                    row_ =
+                        defaultRow_ (Children item items)
                 in
                 FromRow
                     { row_
@@ -1041,6 +1065,7 @@ column (Column { justify }) children_ =
                     (\(ColumnItem item) ->
                         if item.content == None then
                             Nothing
+
                         else
                             Just item
                     )
@@ -1050,9 +1075,10 @@ column (Column { justify }) children_ =
             [] ->
                 None
 
-            (item :: items) ->
+            item :: items ->
                 let
-                    column_ = defaultColumn_ <| Children item items
+                    column_ =
+                        defaultColumn_ <| Children item items
                 in
                 FromColumn
                     { column_
@@ -1061,15 +1087,15 @@ column (Column { justify }) children_ =
                     }
 
 
+
 -- Setter
 
 
 {-| Append `Mixin` on boundaries.
 -}
 setMixin : Mixin msg -> Boundary msg -> Boundary msg
-setMixin new (Boundary boundary ) =
+setMixin new (Boundary boundary) =
     Boundary { boundary | mixin = Mixin.batch [ boundary.mixin, new ] }
-
 
 
 {-| Same as `setMixin` but takes a list of `Mixin`s.
@@ -1102,14 +1128,19 @@ setRole str =
 
 setViewMixin : Mixin msg -> View g msg -> View g msg
 setViewMixin new (View view) =
-    View <| case view of
-        FromBoundary boundary ->
-            FromBoundary { boundary | mixin = Mixin.batch [ boundary.mixin, new ] }
-        FromRow row_ ->
-            FromRow { row_ | mixin = Mixin.batch [ row_.mixin, new ] }
-        FromColumn column_ ->
-            FromColumn { column_ | mixin = Mixin.batch [ column_.mixin, new ] }
-        None -> None
+    View <|
+        case view of
+            FromBoundary boundary ->
+                FromBoundary { boundary | mixin = Mixin.batch [ boundary.mixin, new ] }
+
+            FromRow row_ ->
+                FromRow { row_ | mixin = Mixin.batch [ row_.mixin, new ] }
+
+            FromColumn column_ ->
+                FromColumn { column_ | mixin = Mixin.batch [ column_.mixin, new ] }
+
+            None ->
+                None
 
 
 {-| Set "aria-\*" value for WAI-ARIA.
@@ -1135,6 +1166,7 @@ setBoolAria name g =
     setViewMixin (Mixin.boolAttribute ("aria-" ++ name) g)
 
 
+
 -- Sizing
 
 
@@ -1143,11 +1175,16 @@ type MinWidth
     = MinWidthInBs Float
     | MinWidthInUnit String Float
 
+
 minWidthZero : MinWidth -> Bool
 minWidthZero minWidth =
     case minWidth of
-        MinWidthInBs a -> a == 0
-        MinWidthInUnit _ a -> a == 0
+        MinWidthInBs a ->
+            a == 0
+
+        MinWidthInUnit _ a ->
+            a == 0
+
 
 {-| -}
 type MaxWidth
@@ -1166,8 +1203,12 @@ type MinHeight
 minHeightZero : MinHeight -> Bool
 minHeightZero minHeight =
     case minHeight of
-        MinHeightInBs a -> a == 0
-        MinHeightInUnit _ a -> a == 0
+        MinHeightInBs a ->
+            a == 0
+
+        MinHeightInUnit _ a ->
+            a == 0
+
 
 {-| -}
 type MaxHeight
@@ -1212,7 +1253,6 @@ setMinWidth length (Boundary boundary) =
 
 {-| Set the minimum height as a percentage of the _base size_.
 e.g., `setMinHeightInBs 100` set the _minimum height_ the same length as the _base size_.
-
 -}
 setMinHeightInBs : Float -> Boundary msg -> Boundary msg
 setMinHeightInBs =
@@ -1245,7 +1285,6 @@ setMinHeight length (Boundary boundary) =
 
 
 {-| Set the maximum width to _infinite_, which will be stretched horizontally as much as it does not overhang the parent element.
-
 -}
 setMaxWidthInfinite : Boundary msg -> Boundary msg
 setMaxWidthInfinite =
@@ -1254,7 +1293,6 @@ setMaxWidthInfinite =
 
 {-| Set the maximum width as a percentage of the _base size_.
 e.g., `setMaxWidthInBs 100` set the _maximum width_ the same length as the _base size_.
-
 -}
 setMaxWidthInBs : Float -> Boundary msg -> Boundary msg
 setMaxWidthInBs =
@@ -1287,7 +1325,6 @@ setMaxWidth length (Boundary boundary) =
 
 
 {-| Set the maximum height to _infinite_, which will be stretched vertically as much as it does not overhang the parent element.
-
 -}
 setMaxHeightInfinite : Boundary msg -> Boundary msg
 setMaxHeightInfinite =
@@ -1296,7 +1333,6 @@ setMaxHeightInfinite =
 
 {-| Set the maximum height as a percentage of the _base size_.
 e.g., `setMaxHeightInBs 100` set the _maximum height_ the same length as the _base size_.
-
 -}
 setMaxHeightInBs : Float -> Boundary msg -> Boundary msg
 setMaxHeightInBs =
@@ -1328,6 +1364,7 @@ setMaxHeight length (Boundary boundary) =
     Boundary { boundary | maxHeight = length }
 
 
+
 -- Gap
 
 
@@ -1335,14 +1372,16 @@ setMaxHeight length (Boundary boundary) =
 -}
 setGap : IsGap gap -> Boundary msg -> View gap msg
 setGap (IsGap gap) (Boundary boundary) =
-    View <| case boundary.content of
-        NoContent -> None
-        _ ->
-            FromBoundary
+    View <|
+        case boundary.content of
+            NoContent ->
+                None
+
+            _ ->
+                FromBoundary
                     { boundary
                         | gap = gap
                     }
-
 
 
 {-| Wrap a view with boundary without gap.
@@ -1356,11 +1395,13 @@ setBoundary (View view) =
             , content =
                 if view == None then
                     NoContent
+
                 else
                     ViewContent view
         }
 
 
+{-| -}
 enableVerticalScroll : Boundary msg -> Boundary msg
 enableVerticalScroll (Boundary boundary) =
     Boundary
@@ -1369,6 +1410,7 @@ enableVerticalScroll (Boundary boundary) =
         }
 
 
+{-| -}
 enableHorizontalScroll : Boundary msg -> Boundary msg
 enableHorizontalScroll (Boundary boundary) =
     Boundary
@@ -1395,20 +1437,32 @@ render (Renderer renderer) (Boundary boundary) =
             , self = class "top"
             }
     in
-        { boundary
+    Html.div
+        []
+        [ Mixin.node "style"
+            [ Mixin.style "display" "none"
+            ]
+            [ Html.text neatLayoutStyle
+            ]
+        , { boundary
             | height = FlexSize
             , width = FlexSize
-        }
+          }
             |> preprocessHeight
             |> preprocessWidth
             |> renderBoundary renderer childMixin
+        ]
 
 
 preprocessHeight : Boundary_ msg -> Boundary_ msg
 preprocessHeight boundary =
     case boundary.content of
-        NoContent -> boundary
-        TextContent _ -> boundary
+        NoContent ->
+            boundary
+
+        TextContent _ ->
+            boundary
+
         ViewContent view ->
             let
                 helper : Size -> Boundary_ msg
@@ -1418,20 +1472,26 @@ preprocessHeight boundary =
                         , height = size
                     }
             in
-            case (boundary.verticalOverflow, (boundary.maxHeight, minHeightZero boundary.minHeight), boundary.height) of
-                (True, _, _) ->
+            case ( boundary.verticalOverflow, ( boundary.maxHeight, minHeightZero boundary.minHeight ), boundary.height ) of
+                ( True, _, _ ) ->
                     helper FlexSize
-                (False, (MaxHeightNone, _), MinSize) ->
+
+                ( False, ( MaxHeightNone, _ ), MinSize ) ->
                     helper MinSize
-                (False, (MaxHeightNone, _), FlexSize) ->
+
+                ( False, ( MaxHeightNone, _ ), FlexSize ) ->
                     helper FlexSize
-                (False, (MaxHeightFit, True), _) ->
+
+                ( False, ( MaxHeightFit, True ), _ ) ->
                     helper MinSize
-                (False, (MaxHeightFit, False), _) ->
+
+                ( False, ( MaxHeightFit, False ), _ ) ->
                     helper FlexSize
-                (False, (MaxHeightInBs _, _), _) ->
+
+                ( False, ( MaxHeightInBs _, _ ), _ ) ->
                     helper FlexSize
-                (False, (MaxHeightInUnit _ _, _), _) ->
+
+                ( False, ( MaxHeightInUnit _ _, _ ), _ ) ->
                     helper FlexSize
 
 
@@ -1441,22 +1501,23 @@ setHeight size view =
         FromBoundary boundary ->
             FromBoundary <|
                 preprocessHeight
-                    { boundary |
-                        height = prodSize boundary.height size
-
+                    { boundary
+                        | height = prodSize boundary.height size
                     }
 
         FromRow row_ ->
             let
-                helper s = FromRow
-                    { row_
-                        | children = modifyChild (setHeight s) row_.children
-                        , height = s
-                    }
+                helper s =
+                    FromRow
+                        { row_
+                            | children = modifyChild (setHeight s) row_.children
+                            , height = s
+                        }
             in
             case size of
                 MinSize ->
                     helper FlexSize
+
                 _ ->
                     helper size
 
@@ -1476,20 +1537,26 @@ setHeight size view =
 
 prodSize : Size -> Size -> Size
 prodSize sa sb =
-    case (sa, sb) of
-        (MinSize, _) ->
+    case ( sa, sb ) of
+        ( MinSize, _ ) ->
             MinSize
-        (_, MinSize) ->
+
+        ( _, MinSize ) ->
             MinSize
-        (FlexSize, FlexSize) ->
+
+        ( FlexSize, FlexSize ) ->
             FlexSize
 
 
 preprocessWidth : Boundary_ msg -> Boundary_ msg
 preprocessWidth boundary =
     case boundary.content of
-        NoContent -> boundary
-        TextContent _ -> boundary
+        NoContent ->
+            boundary
+
+        TextContent _ ->
+            boundary
+
         ViewContent view ->
             let
                 helper : Size -> Boundary_ msg
@@ -1499,20 +1566,26 @@ preprocessWidth boundary =
                         , width = prodSize boundary.width size
                     }
             in
-            case (boundary.horizontalOverflow, (boundary.maxWidth, minWidthZero boundary.minWidth), boundary.width) of
-                (True, _, _) ->
+            case ( boundary.horizontalOverflow, ( boundary.maxWidth, minWidthZero boundary.minWidth ), boundary.width ) of
+                ( True, _, _ ) ->
                     helper FlexSize
-                (False, (MaxWidthNone, _), MinSize) ->
+
+                ( False, ( MaxWidthNone, _ ), MinSize ) ->
                     helper MinSize
-                (False, (MaxWidthNone, _), FlexSize) ->
+
+                ( False, ( MaxWidthNone, _ ), FlexSize ) ->
                     helper FlexSize
-                (False, (MaxWidthFit, True), _) ->
+
+                ( False, ( MaxWidthFit, True ), _ ) ->
                     helper MinSize
-                (False, (MaxWidthFit, False), _) ->
+
+                ( False, ( MaxWidthFit, False ), _ ) ->
                     helper FlexSize
-                (False, (MaxWidthInBs _, _), _) ->
+
+                ( False, ( MaxWidthInBs _, _ ), _ ) ->
                     helper FlexSize
-                (False, (MaxWidthInUnit _ _, _), _) ->
+
+                ( False, ( MaxWidthInUnit _ _, _ ), _ ) ->
                     helper FlexSize
 
 
@@ -1522,8 +1595,8 @@ setWidth size view =
         FromBoundary boundary ->
             FromBoundary <|
                 preprocessWidth
-                    { boundary |
-                        width = size
+                    { boundary
+                        | width = size
                     }
 
         FromRow row_ ->
@@ -1551,6 +1624,7 @@ setWidth size view =
             case size of
                 MinSize ->
                     helper FlexSize
+
                 _ ->
                     helper size
 
@@ -1564,8 +1638,9 @@ type alias ChildMixin msg =
     }
 
 
-render_ : Renderer_
-    ->  ChildMixin msg
+render_ :
+    Renderer_
+    -> ChildMixin msg
     -> View_ msg
     -> Html msg
 render_ renderer childMixin view =
@@ -1584,7 +1659,7 @@ render_ renderer childMixin view =
 
 
 renderBoundary : Renderer_ -> ChildMixin msg -> Boundary_ msg -> Html msg
-renderBoundary renderer { inherit, self } o =
+renderBoundary renderer { self } o =
     let
         childMixin =
             { inherit =
@@ -1592,157 +1667,171 @@ renderBoundary renderer { inherit, self } o =
                     [ case o.height of
                         MinSize ->
                             class "heightMinSize"
+
                         FlexSize ->
                             class "heightFlex"
                     , case o.width of
                         MinSize ->
                             class "widthMinSize"
+
                         FlexSize ->
                             class "widthFlex"
                     ]
             , self = class "boundaryContent"
             }
+
         base =
             Mixin.batch
-            [ o.mixin
-            , boundaryCustomProperty renderer o
-            , childMixin.inherit
-            , self
-            , class "boundary"
-            , if o.horizontalOverflow then
-                class "boundary-horizontalOverflow"
-              else
-                Mixin.none
-            , if o.verticalOverflow then
-                class "boundary-verticalOverflow"
-              else
-                Mixin.none
-            , if o.maxHeight /= MaxHeightNone then
-                class "boundary-hasMaxHeight"
-              else
-                Mixin.none
-            , if o.maxWidth /= MaxWidthNone then
-                class "boundary-hasMaxWidth"
-              else
-                Mixin.none
-            , if not <| List.isEmpty o.overlays then
-                class "boundary-hasOverlays"
-              else
-                Mixin.none
-            , if o.enforcePointerEvent then
-                class "boundary-enforcePointerEvent"
-              else
-                Mixin.none
-            ]
+                [ o.mixin
+                , boundaryCustomProperty renderer o
+                , childMixin.inherit
+                , self
+                , class "boundary"
+                , if o.horizontalOverflow then
+                    class "boundary-horizontalOverflow"
+
+                  else
+                    Mixin.none
+                , if o.verticalOverflow then
+                    class "boundary-verticalOverflow"
+
+                  else
+                    Mixin.none
+                , if o.maxHeight /= MaxHeightNone then
+                    class "boundary-hasMaxHeight"
+
+                  else
+                    Mixin.none
+                , if o.maxWidth /= MaxWidthNone then
+                    class "boundary-hasMaxWidth"
+
+                  else
+                    Mixin.none
+                , if not <| List.isEmpty o.overlays then
+                    class "boundary-hasOverlays"
+
+                  else
+                    Mixin.none
+                , if o.enforcePointerEvent then
+                    class "boundary-enforcePointerEvent"
+
+                  else
+                    Mixin.none
+                ]
     in
     case o.content of
         NoContent ->
             Html.text ""
+
         ViewContent content ->
             if o.verticalOverflow && o.innerGap.vertical /= 0 then
-                Mixin.lift (Html.node o.nodeName)
+                Mixin.node o.nodeName
                     [ base
                     ]
-                    [ Mixin.div
+                    [ Mixin.keyed "div"
                         [ class "boundary_scroller"
                         , class "boundary_scroller-verticalScroll"
                         ]
-                        ( render_ renderer childMixin content ::
-                            List.map (renderOverlay renderer) o.overlays
+                        (( "content", render_ renderer childMixin content )
+                            :: List.map (renderOverlay renderer) o.overlays
                         )
                     ]
+
             else
-                Mixin.lift (Html.node o.nodeName)
+                Mixin.keyed o.nodeName
                     [ base
                     , class "boundary-view"
                     ]
-                    ( render_ renderer childMixin content ::
-                        List.map (renderOverlay renderer) o.overlays
+                    (( "content", render_ renderer childMixin content )
+                        :: List.map (renderOverlay renderer) o.overlays
                     )
-        TextContent texts ->
-                texts
-                    |> List.map
-                        (\inline ->
-                            Mixin.lift (Html.node inline.nodeName)
-                                [ inline.mixin
-                                , class "boundary_text"
-                                ]
-                                [ Html.text inline.text
-                                ]
-                        )
-                    |> (\children -> children ++
-                            List.map (renderOverlay renderer) o.overlays
-                       )
-                    |> Mixin.lift (Html.node o.nodeName)
-                        [ base
-                        , class "boundary-text"
-                        ]
 
+        TextContent texts ->
+            texts
+                |> List.indexedMap
+                    (\n inline ->
+                        ( "content" ++ String.fromInt n
+                        , Mixin.node inline.nodeName
+                            [ inline.mixin
+                            , class "boundary_text"
+                            ]
+                            [ Html.text inline.text
+                            ]
+                        )
+                    )
+                |> (\children ->
+                        children
+                            ++ List.map (renderOverlay renderer) o.overlays
+                   )
+                |> Mixin.keyed o.nodeName
+                    [ base
+                    , class "boundary-text"
+                    ]
 
 
 boundaryCustomProperty : Renderer_ -> Boundary_ msg -> Mixin msg
 boundaryCustomProperty renderer o =
     Mixin.batch
         [ Mixin.style "--outer-gap-x"
-          ( multipleBaseSize o.gap.horizontal renderer.baseSize
-                  |> renderBaseSize
-          )
+            (multipleBaseSize o.gap.horizontal renderer.baseSize
+                |> renderBaseSize
+            )
         , Mixin.style "--outer-gap-y"
-          ( multipleBaseSize o.gap.vertical renderer.baseSize
-                  |> renderBaseSize
-          )
+            (multipleBaseSize o.gap.vertical renderer.baseSize
+                |> renderBaseSize
+            )
         , Mixin.style "--inner-gap-x"
-          ( multipleBaseSize o.innerGap.horizontal renderer.baseSize
-                  |> renderBaseSize
-          )
+            (multipleBaseSize o.innerGap.horizontal renderer.baseSize
+                |> renderBaseSize
+            )
         , Mixin.style "--inner-gap-y"
-          ( multipleBaseSize o.innerGap.vertical renderer.baseSize
-                  |> renderBaseSize
-          )
+            (multipleBaseSize o.innerGap.vertical renderer.baseSize
+                |> renderBaseSize
+            )
         , case o.minWidth of
             MinWidthInBs bs ->
                 Mixin.style "--min-width"
-                  ( multipleBaseSize bs renderer.baseSize
-                    |> renderBaseSize
-                  )
+                    (multipleBaseSize bs renderer.baseSize
+                        |> renderBaseSize
+                    )
+
             MinWidthInUnit unit v ->
                 Mixin.style "--min-width"
-                  ( String.fromFloat v ++ unit
-                  )
+                    (String.fromFloat v ++ unit)
         , case o.maxWidth of
             MaxWidthInBs bs ->
                 Mixin.style "--max-width"
-                  ( multipleBaseSize bs renderer.baseSize
-                    |> renderBaseSize
-                  )
+                    (multipleBaseSize bs renderer.baseSize
+                        |> renderBaseSize
+                    )
 
             MaxWidthInUnit unit v ->
                 Mixin.style "--max-width"
-                  ( String.fromFloat v ++ unit
-                  )
+                    (String.fromFloat v ++ unit)
+
             _ ->
                 Mixin.none
         , case o.minHeight of
             MinHeightInBs bs ->
                 Mixin.style "--min-height"
-                  ( multipleBaseSize bs renderer.baseSize
-                    |> renderBaseSize
-                  )
+                    (multipleBaseSize bs renderer.baseSize
+                        |> renderBaseSize
+                    )
+
             MinHeightInUnit unit v ->
                 Mixin.style "--min-height"
-                  ( String.fromFloat v ++ unit
-                  )
+                    (String.fromFloat v ++ unit)
         , case o.maxHeight of
             MaxHeightInBs bs ->
                 Mixin.style "--max-height"
-                  ( multipleBaseSize bs renderer.baseSize
-                    |> renderBaseSize
-                  )
+                    (multipleBaseSize bs renderer.baseSize
+                        |> renderBaseSize
+                    )
 
             MaxHeightInUnit unit v ->
                 Mixin.style "--max-height"
-                  ( String.fromFloat v ++ unit
-                  )
+                    (String.fromFloat v ++ unit)
+
             _ ->
                 Mixin.none
         ]
@@ -1757,46 +1846,54 @@ renderRow renderer { inherit, self } o =
                 , case o.height of
                     MinSize ->
                         class "heightMinSize"
+
                     FlexSize ->
                         class "heightFlex"
                 , case o.width of
                     MinSize ->
                         class "widthMinSize"
+
                     FlexSize ->
                         class "widthFlex"
                 , self
                 , class "row"
                 , if o.wrap then
                     class "row-wrap"
+
                   else
                     Mixin.none
                 , case o.justifyContent of
                     AlignStart ->
                         class "row-justifyStart"
+
                     AlignCenter ->
                         class "row-justifyCenter"
+
                     AlignEnd ->
                         class "row-justifyEnd"
                 ]
 
         childMixin item =
             { inherit = inherit
-            , self = Mixin.batch
-                [ class "rowChild"
-                , if item.grow then
-                    class "rowChild-grow"
-                  else
-                    Mixin.none
-                , case item.alignSelf of
-                    AlignStart ->
-                        class "rowChild-alignStart"
-                    AlignCenter ->
-                        class "rowChild-alignCenter"
-                    AlignEnd ->
-                        class "rowChild-alignEnd"
-                ]
-            }
+            , self =
+                Mixin.batch
+                    [ class "rowChild"
+                    , if item.grow then
+                        class "rowChild-grow"
 
+                      else
+                        Mixin.none
+                    , case item.alignSelf of
+                        AlignStart ->
+                            class "rowChild-alignStart"
+
+                        AlignCenter ->
+                            class "rowChild-alignCenter"
+
+                        AlignEnd ->
+                            class "rowChild-alignEnd"
+                    ]
+            }
     in
     case o.children of
         Children item [] ->
@@ -1804,14 +1901,14 @@ renderRow renderer { inherit, self } o =
                 [ base
                 , class "row-single"
                 ]
-                [ (item.key, render_ renderer (childMixin item) item.content)
+                [ ( item.key, render_ renderer (childMixin item) item.content )
                 ]
 
         Children item0 items ->
             (item0 :: items)
                 |> List.map
                     (\item ->
-                        (item.key, render_ renderer (childMixin item) item.content)
+                        ( item.key, render_ renderer (childMixin item) item.content )
                     )
                 |> Mixin.keyed o.nodeName
                     [ base
@@ -1828,11 +1925,13 @@ renderColumn renderer { inherit, self } o =
                 , case o.height of
                     MinSize ->
                         class "heightMinSize"
+
                     FlexSize ->
                         class "heightFlex"
                 , case o.width of
                     MinSize ->
                         class "widthMinSize"
+
                     FlexSize ->
                         class "widthFlex"
                 , self
@@ -1840,30 +1939,35 @@ renderColumn renderer { inherit, self } o =
                 , case o.justifyContent of
                     AlignStart ->
                         class "column-justifyStart"
+
                     AlignCenter ->
                         class "column-justifyCenter"
+
                     AlignEnd ->
                         class "column-justifyEnd"
                 ]
 
         childMixin item =
             { inherit = inherit
-            , self = Mixin.batch
-                [ class "columnChild"
-                , if item.grow then
-                    class "columnChild-grow"
-                  else
-                    Mixin.none
-                , case item.alignSelf of
-                    AlignStart ->
-                        class "columnChild-alignStart"
-                    AlignCenter ->
-                        class "columnChild-alignCenter"
-                    AlignEnd ->
-                        class "columnChild-alignEnd"
-                ]
-            }
+            , self =
+                Mixin.batch
+                    [ class "columnChild"
+                    , if item.grow then
+                        class "columnChild-grow"
 
+                      else
+                        Mixin.none
+                    , case item.alignSelf of
+                        AlignStart ->
+                            class "columnChild-alignStart"
+
+                        AlignCenter ->
+                            class "columnChild-alignCenter"
+
+                        AlignEnd ->
+                            class "columnChild-alignEnd"
+                    ]
+            }
     in
     case o.children of
         Children item [] ->
@@ -1871,14 +1975,14 @@ renderColumn renderer { inherit, self } o =
                 [ base
                 , class "column-single"
                 ]
-                [ (item.key, render_ renderer (childMixin item) item.content)
+                [ ( item.key, render_ renderer (childMixin item) item.content )
                 ]
 
         Children item0 items ->
             (item0 :: items)
                 |> List.map
                     (\item ->
-                        (item.key, render_ renderer (childMixin item) item.content)
+                        ( item.key, render_ renderer (childMixin item) item.content )
                     )
                 |> Mixin.keyed o.nodeName
                     [ base
@@ -1886,11 +1990,12 @@ renderColumn renderer { inherit, self } o =
                     ]
 
 
-
-renderOverlay : Renderer_ -> Overlay msg -> Html msg
+renderOverlay : Renderer_ -> Overlay msg -> ( String, Html msg )
 renderOverlay renderer overlay =
     let
-        (Boundary boundary) = overlay.boundary
+        (Boundary boundary) =
+            overlay.boundary
+
         childMixin =
             { inherit =
                 Mixin.batch
@@ -1900,30 +2005,33 @@ renderOverlay renderer overlay =
             , self =
                 Mixin.batch
                     [ class "overlay"
-                    , Mixin.style "--overlay-top" ( String.fromFloat overlay.area.top ++ "%")
-                    , Mixin.style "--overlay-bottom" ( String.fromFloat overlay.area.bottom ++ "%")
-                    , Mixin.style "--overlay-left" ( String.fromFloat overlay.area.left ++ "%")
-                    , Mixin.style "--overlay-right" ( String.fromFloat overlay.area.right ++ "%")
+                    , Mixin.style "--overlay-top" (String.fromFloat overlay.area.top ++ "%")
+                    , Mixin.style "--overlay-bottom" (String.fromFloat overlay.area.bottom ++ "%")
+                    , Mixin.style "--overlay-left" (String.fromFloat overlay.area.left ++ "%")
+                    , Mixin.style "--overlay-right" (String.fromFloat overlay.area.right ++ "%")
                     , Mixin.style "--overlay-priority"
-                      ( overlay.area.priority
-                        |> Maybe.map String.fromInt
-                        |> Maybe.withDefault "auto"
-                      )
+                        (overlay.area.priority
+                            |> Maybe.map String.fromInt
+                            |> Maybe.withDefault "auto"
+                        )
                     ]
             }
     in
-        { boundary
-            | height = FlexSize
-            , width = FlexSize
-        }
-            |> preprocessHeight
-            |> preprocessWidth
-            |> renderBoundary renderer childMixin
+    ( "overlay-" ++ overlay.name
+    , { boundary
+        | height = FlexSize
+        , width = FlexSize
+      }
+        |> preprocessHeight
+        |> preprocessWidth
+        |> renderBoundary renderer childMixin
+    )
 
 
 class : String -> Mixin msg
 class str =
     Mixin.class <| "elmNeatLayout--" ++ str
+
 
 
 -- Low level function for HTML
@@ -1932,14 +2040,20 @@ class str =
 {-| -}
 setNodeName : String -> View gap msg -> View gap msg
 setNodeName str (View view) =
-    View <| case view of
-        FromBoundary boundary ->
-            FromBoundary { boundary | nodeName = str }
-        FromRow row_ ->
-            FromRow { row_ | nodeName = str }
-        FromColumn column_ ->
-            FromColumn { column_ | nodeName = str }
-        None -> None
+    View <|
+        case view of
+            FromBoundary boundary ->
+                FromBoundary { boundary | nodeName = str }
+
+            FromRow row_ ->
+                FromRow { row_ | nodeName = str }
+
+            FromColumn column_ ->
+                FromColumn { column_ | nodeName = str }
+
+            None ->
+                None
+
 
 
 -- Layer
@@ -1948,6 +2062,7 @@ setNodeName str (View view) =
 {-| Set the position of each edge of the overlay layer as a percentage of the base view.
 
 The `priority` field specifies how much the element is superimposed on the front side in preference to other elements. If given `Nothing`, it is set equivalent priority comparing to other elements.
+
 -}
 type alias Layer =
     { top : Float
@@ -1979,7 +2094,6 @@ defaultLayer =
     }
 
 
-
 {-| Put overlay layer on the parent view.
 -}
 putLayer : String -> ( Layer, Boundary (Layered msg) ) -> Boundary msg -> Boundary msg
@@ -1991,7 +2105,7 @@ putLayer name ( area, layered ) (Boundary boundary) =
                 , area = area
                 , boundary = mapBoundary (\(Layered a) -> a) layered
                 }
-                :: boundary.overlays
+                    :: boundary.overlays
         }
 
 
@@ -2007,11 +2121,80 @@ mapLayered f =
 
 
 {-| Convert `Boundary` for `putLayer`. The `Boundary (Layered msg)` ignores pointer events; this feature is especially helpfull for realizing popups with clickable background.
-
 -}
 toLayered : Boundary msg -> Boundary (Layered msg)
 toLayered (Boundary boundary) =
     Boundary
-        { boundary | enforcePointerEvent = True
+        { boundary
+            | enforcePointerEvent = True
         }
-            |> mapBoundary Layered
+        |> mapBoundary Layered
+
+
+
+-- Handle conditions
+
+
+{-| Insert a view only when a condition is met.
+-}
+when : Bool -> View gap msg -> View gap msg
+when p v =
+    if p then
+        v
+
+    else
+        none
+
+
+{-| Insert a view unless a condition is met.
+-}
+unless : Bool -> View gap msg -> View gap msg
+unless p =
+    when <| not p
+
+
+{-| Insert a view only if the given value is `Just`.
+-}
+withMaybe : Maybe a -> (a -> View gap msg) -> View gap msg
+withMaybe ma f =
+    case ma of
+        Just a ->
+            f a
+
+        Nothing ->
+            none
+
+
+{-| Apply a modifier only when a condition is met.
+-}
+applyWhen : Bool -> (viewOrText -> viewOrText) -> viewOrText -> viewOrText
+applyWhen p f =
+    if p then
+        f
+
+    else
+        identity
+
+
+{-| Apply a modifier unless a condition is met.
+-}
+applyUnless : Bool -> (viewOrText -> viewOrText) -> viewOrText -> viewOrText
+applyUnless p =
+    applyWhen (not p)
+
+
+{-| Apply a modifier only if the given value is `Just`.
+-}
+applyWithMaybe : Maybe a -> (a -> viewOrText -> viewOrText) -> viewOrText -> viewOrText
+applyWithMaybe ma f =
+    case ma of
+        Just a ->
+            f a
+
+        Nothing ->
+            identity
+
+
+neatLayoutStyle : String
+neatLayoutStyle =
+    ""

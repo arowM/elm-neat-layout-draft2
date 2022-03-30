@@ -2,16 +2,13 @@ module Main exposing (Model, Msg, main)
 
 import Browser exposing (Document)
 import Gap
-import Html exposing (Html)
-import Html.Attributes as Attributes
-import Html.Events as Events
 import Mixin
-import Mixin.Html as Mixin
-import Neat exposing (Boundary, View, NoGap)
+import Neat exposing (Boundary)
 
 
 
 -- App
+
 
 main : Program () Model Msg
 main =
@@ -34,17 +31,15 @@ init =
     )
 
 
-type Msg
-    = NoOp
+type alias Msg =
+    ()
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        NoOp ->
-            ( model
-            , Cmd.none
-            )
+update _ model =
+    ( model
+    , Cmd.none
+    )
 
 
 view : Model -> Document Msg
@@ -60,7 +55,7 @@ view model =
 body : Model -> Boundary Msg
 body _ =
     Neat.column
-        ( Neat.defaultColumn
+        (Neat.defaultColumn
             |> Neat.alignBottom
         )
         [ Neat.row
@@ -68,6 +63,13 @@ body _ =
             [ Neat.textBlock "Header"
                 |> Neat.setGap Gap.body
                 |> Neat.grownMiddleItem "text"
+            , Neat.empty
+                |> Neat.setMinWidthInEm 4
+                |> Neat.setMixin (Mixin.attribute "placeholder" "foo")
+                |> Neat.setMixin (Mixin.style "padding" "0.4em")
+                |> Neat.setGap Gap.body
+                |> Neat.setNodeName "input"
+                |> Neat.grownMiddleItem "input"
             , Neat.row
                 (Neat.defaultRow
                     |> Neat.alignCenter
@@ -84,11 +86,11 @@ body _ =
                 |> Neat.setGap Gap.body
                 |> Neat.middleItem "hamburger"
             ]
-                |> Neat.setBoundary
-                |> Neat.setMaxWidthInfinite
-                |> Neat.setMixin (Mixin.class "header")
-                |> Neat.setGap Neat.noGap
-                |> Neat.leftItem "header"
+            |> Neat.setBoundary
+            |> Neat.setMaxWidthInfinite
+            |> Neat.setMixin (Mixin.class "header")
+            |> Neat.setGap Neat.noGap
+            |> Neat.leftItem "header"
         , Neat.column
             Neat.defaultColumn
             [ Neat.textBlock

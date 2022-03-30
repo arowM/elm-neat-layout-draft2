@@ -40,20 +40,22 @@ config =
     , NoMissingTypeAnnotation.rule
     , NoMissingTypeExpose.rule
     , NoUnused.CustomTypeConstructorArgs.rule
-    , NoUnused.CustomTypeConstructors.rule []
+    , NoUnused.CustomTypeConstructors.rule
+        []
     , NoUnused.Dependencies.rule
     , NoUnused.Exports.rule
         |> Rule.ignoreErrorsForDirectories
             [ "tests/VerifyExamples"
+            ]
+        |> Rule.ignoreErrorsForFiles
+            [ "src/Neat.elm"
+            , "src/Neat/Text.elm"
             ]
     , NoUnused.Modules.rule
     , NoUnused.Parameters.rule
     , NoUnused.Patterns.rule
     , NoUnused.Variables.rule
     , Simplify.defaults
-        |> Simplify.ignoreCaseOfForTypes
-            [ "Main.Msg"
-            ]
         |> Simplify.rule
     ]
         |> List.map

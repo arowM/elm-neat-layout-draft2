@@ -1,5 +1,6 @@
 .elmNeatLayout {
   $prefix: &;
+  $top: #{$prefix}--top;
   $boundary: #{$prefix}--boundary;
   $boundaryContent: #{$prefix}--boundaryContent;
   $row: #{$prefix}--row;
@@ -54,7 +55,7 @@
   &--boundary {
     overflow: hidden;
 
-    &-hasOverlays {
+    &-hasOverlays:not(#{$top}) {
       position: relative;
     }
 

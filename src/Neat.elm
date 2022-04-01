@@ -3,6 +3,7 @@ module Neat exposing
     , map
     , Boundary
     , mapBoundary
+    , asView
     , NoGap
     , noGap
     , render
@@ -42,6 +43,7 @@ module Neat exposing
     , Row
     , defaultRow
     , enableWrap
+    , RowItem
     , alignCenter
     , alignRight
     , topItem
@@ -53,6 +55,7 @@ module Neat exposing
     , column
     , Column
     , defaultColumn
+    , ColumnItem
     , alignMiddle
     , alignBottom
     , leftItem
@@ -76,7 +79,6 @@ module Neat exposing
     , IsGap(..)
     , Gap
     , setNodeName
-    , ColumnItem, RowItem
     )
 
 {-| Main module for elm-neat-layout.
@@ -88,6 +90,7 @@ module Neat exposing
 @docs map
 @docs Boundary
 @docs mapBoundary
+@docs asView
 @docs NoGap
 @docs noGap
 
@@ -215,6 +218,7 @@ The initial value for maximum height is _fit_, which shrinks as much as its chil
 @docs Row
 @docs defaultRow
 @docs enableWrap
+@docs RowItem
 @docs alignCenter
 @docs alignRight
 
@@ -240,6 +244,7 @@ Each function has the `String` argument, which helps make the DOM modifications 
 
 @docs Column
 @docs defaultColumn
+@docs ColumnItem
 @docs alignMiddle
 @docs alignBottom
 
@@ -326,6 +331,31 @@ type View_ msg
     | FromRow (Row_ msg)
     | FromColumn (Column_ msg)
     | None
+
+
+{-| Apply `View` modifiers on `Boundary`.
+
+    Neat.empty
+        |> Neat.asView
+            [ Neat.setNodeName "p"
+            , Neat.setBoolAria "hidden" True
+            ]
+
+-}
+asView : List (View NoGap msg -> View NoGap msg) -> Boundary msg -> Boundary msg
+asView fs (Boundary boundary_) =
+    Boundary <|
+        List.foldl
+            (\f acc ->
+                case f (View (FromBoundary acc)) of
+                    View (FromBoundary next) ->
+                        next
+
+                    _ ->
+                        acc
+            )
+            boundary_
+            fs
 
 
 {-| A bounded View without gap.

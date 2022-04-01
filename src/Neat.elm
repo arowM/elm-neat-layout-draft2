@@ -1765,6 +1765,7 @@ renderBoundary renderer { self } o =
                   else
                     Mixin.none
                 ]
+        overlays = List.reverse o.overlays
     in
     case o.content of
         NoContent ->
@@ -1780,7 +1781,7 @@ renderBoundary renderer { self } o =
                         , class "boundary_scroller-verticalScroll"
                         ]
                         (( "content", render_ renderer childMixin content )
-                            :: List.map (renderOverlay renderer) o.overlays
+                            :: List.map (renderOverlay renderer) overlays
                         )
                     ]
 
@@ -1790,7 +1791,7 @@ renderBoundary renderer { self } o =
                     , class "boundary-view"
                     ]
                     (( "content", render_ renderer childMixin content )
-                        :: List.map (renderOverlay renderer) o.overlays
+                        :: List.map (renderOverlay renderer) overlays
                     )
 
         HtmlContent children ->
@@ -1803,7 +1804,7 @@ renderBoundary renderer { self } o =
                     )
                 |> (\cs ->
                         cs
-                            ++ List.map (renderOverlay renderer) o.overlays
+                            ++ List.map (renderOverlay renderer) overlays
                    )
                 |> Mixin.keyed o.nodeName
                     [ base
@@ -1825,7 +1826,7 @@ renderBoundary renderer { self } o =
                     )
                 |> (\children ->
                         children
-                            ++ List.map (renderOverlay renderer) o.overlays
+                            ++ List.map (renderOverlay renderer) overlays
                    )
                 |> Mixin.keyed o.nodeName
                     [ base

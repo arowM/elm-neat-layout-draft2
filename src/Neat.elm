@@ -925,7 +925,6 @@ empty =
 
 
 {-| Build view with text from `Text`s.
-The _minimum width_ is set to `"1em"`.
 
 Unlike a `Neat.row` of `Neat.textBlock`s, the `fromTexts` generates a single coherent sentence.
 
@@ -968,7 +967,6 @@ fromTexts ls =
 
                 else
                     TextContent texts
-            , minWidth = MinWidthInUnit "em" 1
         }
 
 

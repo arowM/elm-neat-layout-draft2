@@ -79,6 +79,7 @@ module Neat exposing
     , IsGap(..)
     , Gap
     , setNodeName
+    , html
     )
 
 {-| Main module for elm-neat-layout.
@@ -304,6 +305,7 @@ You can use custom gaps just by declaring new types and `IsGap` values for them.
 # Lower level functions for HTML
 
 @docs setNodeName
+@docs html
 
 -}
 
@@ -389,6 +391,7 @@ type alias Boundary_ msg =
 type Content msg
     = TextContent (List (Text msg))
     | ViewContent (View_ msg)
+    | HtmlContent (List ( String, Boundary_ msg ))
     | NoContent
 
 
@@ -748,6 +751,14 @@ mapBoundary_ f o =
 
             ViewContent view ->
                 ViewContent <| map_ f view
+
+            HtmlContent children ->
+                HtmlContent <|
+                    List.map
+                        (\( k, b ) ->
+                            ( k, mapBoundary_ f b )
+                        )
+                        children
 
             NoContent ->
                 NoContent
@@ -1493,6 +1504,9 @@ preprocessHeight boundary =
         TextContent _ ->
             boundary
 
+        HtmlContent _ ->
+            boundary
+
         ViewContent view ->
             let
                 helper : Size -> Boundary_ msg
@@ -1585,6 +1599,9 @@ preprocessWidth boundary =
             boundary
 
         TextContent _ ->
+            boundary
+
+        HtmlContent _ ->
             boundary
 
         ViewContent view ->
@@ -1775,6 +1792,23 @@ renderBoundary renderer { self } o =
                     (( "content", render_ renderer childMixin content )
                         :: List.map (renderOverlay renderer) o.overlays
                     )
+
+        HtmlContent children ->
+            children
+                |> List.map
+                    (\( k, b ) ->
+                        ( k
+                        , renderBoundary renderer childMixin b
+                        )
+                    )
+                |> (\cs ->
+                        cs
+                            ++ List.map (renderOverlay renderer) o.overlays
+                   )
+                |> Mixin.keyed o.nodeName
+                    [ base
+                    , class "boundary-html"
+                    ]
 
         TextContent texts ->
             texts
@@ -2083,6 +2117,71 @@ setNodeName str (View view) =
 
             None ->
                 None
+
+
+{-| Build HTML tag. When you need to build a HTML tag with its children, `html` will help you.
+
+    animalSelect : Maybe Animal -> Boundary msg
+    animalSelect animal =
+        Neat.html "select"
+            [ animalOption Nothing animal
+            , animalOption (Just Goat) animal
+            , animalOption (Just Dog) animal
+            , animalOption (Just Cat) animal
+            ]
+            |> Neat.setMixin
+                (Mixin.Events.onChange ChangeAnimal)
+
+    animalOption : Maybe Animal
+            -> Maybe Animal
+            -> ( String, Boundary msg )
+    animalOption animal selected =
+        let
+            key =
+                animal
+                    |> Maybe.map Animal.toValue
+                    |> Maybe.withDefault "default"
+
+            disabled =
+                animal == Nothing
+
+            selected =
+                animal == selected
+
+            value =
+                animal
+                    |> Maybe.map Animal.toValue
+                    |> Maybe.withDefault ""
+
+            label =
+                animal
+                    |> Maybe.map Animal.toLabel
+                    |> Maybe.withDefault "-- Select one --"
+        in
+        ( key
+        , Neat.textBlock label
+            |> Neat.asView
+                [ Neat.setNodeName "option"
+                ]
+            |> Neat.setAttributes
+                [ Attributes.disabled disabled
+                , Attributes.selected selected
+                , Attributes.value value
+                ]
+        )
+
+-}
+html : String -> List ( String, Boundary msg ) -> Boundary msg
+html tag children_ =
+    let
+        children =
+            List.map (\( key, Boundary boundary_ ) -> ( key, boundary_ )) children_
+    in
+    Boundary
+        { defaultBoundary
+            | content = HtmlContent children
+            , nodeName = tag
+        }
 
 
 

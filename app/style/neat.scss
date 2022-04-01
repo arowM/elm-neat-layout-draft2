@@ -46,8 +46,8 @@
     right: var(--overlay-right);
     z-index: var(--overlay-priority);
     overflow: hidden;
-    min-width: var(--min-height);
-    max-width: var(--max-height);
+    min-width: var(--min-width);
+    max-width: var(--max-width);
     min-height: var(--min-height);
     max-height: var(--max-height);
   }

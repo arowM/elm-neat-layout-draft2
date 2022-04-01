@@ -218,6 +218,10 @@
       flex-grow: 0;
       flex-shrink: 0;
 
+      &#{$boundary}-text {
+        width: auto;
+      }
+
       &#{$columnChild}-grow {
         flex-grow: 1;
       }

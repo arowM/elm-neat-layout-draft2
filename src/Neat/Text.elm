@@ -65,16 +65,7 @@ type alias Text msg =
 -- Primitive constructors
 
 
-{-| Generate a `Text` with given text. The result is just a text node but not a HTML node with text content.
-Use `setNodeName` or set attributes by following functions to make the result wrapped with HTML tag.
-
-  - setMixin
-  - setMixins
-  - setAttribute
-  - setAttributes
-
-When you use the function above without `setNodeName`, the wrapper HTML tag becomes `span`.
-
+{-| Generate a `Text` with given text.
 -}
 fromString : String -> Text msg
 fromString str =
@@ -84,7 +75,7 @@ fromString str =
 
         _ ->
             { mixin = Mixin.none
-            , nodeName = Nothing
+            , nodeName = "span"
             , text = str
             }
 
@@ -106,7 +97,7 @@ In most cases, a function such as `when` will suffice, though.
 none : Text msg
 none =
     { mixin = Mixin.none
-    , nodeName = Nothing
+    , nodeName = "span"
     , text = ""
     }
 
@@ -182,7 +173,7 @@ withMaybe ma f =
 setNodeName : String -> Text msg -> Text msg
 setNodeName str text =
     { text
-        | nodeName = Just str
+        | nodeName = str
     }
 
 

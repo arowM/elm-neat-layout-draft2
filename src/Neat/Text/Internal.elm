@@ -5,6 +5,6 @@ import Mixin exposing (Mixin)
 
 type alias InlineNode msg =
     { mixin : Mixin msg
-    , nodeName : Maybe String
+    , nodeName : String
     , text : String
     }

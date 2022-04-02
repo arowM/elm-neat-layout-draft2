@@ -1764,7 +1764,9 @@ renderBoundary renderer { self } o =
                   else
                     Mixin.none
                 ]
-        overlays = List.reverse o.overlays
+
+        overlays =
+            List.reverse o.overlays
     in
     case o.content of
         NoContent ->
@@ -1815,12 +1817,16 @@ renderBoundary renderer { self } o =
                 |> List.indexedMap
                     (\n inline ->
                         ( "content" ++ String.fromInt n
-                        , Mixin.node inline.nodeName
-                            [ inline.mixin
-                            , class "boundary_text"
-                            ]
-                            [ Html.text inline.text
-                            ]
+                        , if inline.mixin == Mixin.none then
+                            Html.text inline.text
+
+                          else
+                            Mixin.node (Maybe.withDefault "span" inline.nodeName)
+                                [ inline.mixin
+                                , class "boundary_text"
+                                ]
+                                [ Html.text inline.text
+                                ]
                         )
                     )
                 |> (\children ->
@@ -2132,9 +2138,10 @@ setNodeName str (View view) =
             |> Neat.setMixin
                 (Mixin.Events.onChange ChangeAnimal)
 
-    animalOption : Maybe Animal
-            -> Maybe Animal
-            -> ( String, Boundary msg )
+    animalOption :
+        Maybe Animal
+        -> Maybe Animal
+        -> ( String, Boundary msg )
     animalOption animal selected =
         let
             key =

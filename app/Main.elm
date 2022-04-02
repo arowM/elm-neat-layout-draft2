@@ -3,7 +3,9 @@ module Main exposing (Model, Msg, main)
 import Browser exposing (Document)
 import Gap
 import Mixin
-import Neat exposing (Boundary)
+import Neat
+import Neat.Boundary as Boundary exposing (Boundary)
+import Neat.View as View
 
 
 
@@ -54,80 +56,80 @@ view model =
 
 body : Model -> Boundary Msg
 body _ =
-    Neat.column
-        (Neat.defaultColumn
-            |> Neat.alignBottom
+    View.column
+        (View.defaultColumn
+            |> View.alignBottom
         )
-        [ Neat.row
-            Neat.defaultRow
-            [ Neat.textBlock "Header"
-                |> Neat.setGap Gap.body
-                |> Neat.grownMiddleItem "text"
-            , Neat.empty
-                |> Neat.setMinWidthInEm 4
-                |> Neat.setMixin (Mixin.attribute "placeholder" "foo")
-                |> Neat.setMixin (Mixin.style "padding" "0.4em")
-                |> Neat.setGap Gap.body
-                |> Neat.setNodeName "input"
-                |> Neat.grownMiddleItem "input"
-            , Neat.row
-                (Neat.defaultRow
-                    |> Neat.alignCenter
+        [ View.row
+            View.defaultRow
+            [ Boundary.textBlock "Header"
+                |> Boundary.setGap Gap.body
+                |> View.grownMiddleItem "text"
+            , Boundary.empty
+                |> Boundary.setMinWidthInEm 4
+                |> Boundary.setMixin (Mixin.attribute "placeholder" "foo")
+                |> Boundary.setMixin (Mixin.style "padding" "0.4em")
+                |> Boundary.setGap Gap.body
+                |> View.setNodeName "input"
+                |> View.grownMiddleItem "input"
+            , View.row
+                (View.defaultRow
+                    |> View.alignCenter
                 )
-                [ Neat.textBlock "三"
-                    |> Neat.setGap Neat.noGap
-                    |> Neat.middleItem "icon"
+                [ Boundary.textBlock "三"
+                    |> Boundary.setGap Neat.noGap
+                    |> View.middleItem "icon"
                 ]
-                |> Neat.setBoundary
-                |> Neat.setMinWidthInEm 3
-                |> Neat.setMaxWidthInEm 3
-                |> Neat.setMinHeightInEm 3
-                |> Neat.setMixin (Mixin.class "header_hamburger")
-                |> Neat.setGap Gap.body
-                |> Neat.middleItem "hamburger"
+                |> View.setBoundary
+                |> Boundary.setMinWidthInEm 3
+                |> Boundary.setMaxWidthInEm 3
+                |> Boundary.setMinHeightInEm 3
+                |> Boundary.setMixin (Mixin.class "header_hamburger")
+                |> Boundary.setGap Gap.body
+                |> View.middleItem "hamburger"
             ]
-            |> Neat.setBoundary
-            |> Neat.setMaxWidthInfinite
-            |> Neat.setMixin (Mixin.class "header")
-            |> Neat.setGap Neat.noGap
-            |> Neat.leftItem "header"
-        , Neat.column
-            Neat.defaultColumn
-            [ Neat.textBlock
+            |> View.setBoundary
+            |> Boundary.setMaxWidthInfinite
+            |> Boundary.setMixin (Mixin.class "header")
+            |> Boundary.setGap Neat.noGap
+            |> View.leftItem "header"
+        , View.column
+            View.defaultColumn
+            [ Boundary.textBlock
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                -- |> Neat.setMinHeightInEm 10
-                |> Neat.setMaxHeightInEm 25
-                -- |> Neat.setMaxWidthInEm 35
-                |> Neat.setMaxWidthInfinite
-                |> Neat.setMinWidthInEm 16
-                |> Neat.setGap Gap.body
-                |> Neat.leftItem "sampleText"
-            , Neat.empty
-                |> Neat.setMinHeightInEm 5
-                |> Neat.setMinWidthInEm 10
-                |> Neat.setMaxWidthInEm 20
-                |> Neat.setMaxHeightInfinite
-                |> Neat.setMixin (Mixin.class "red")
-                |> Neat.setGap Gap.body
-                |> Neat.leftItem "sampleBox"
-            , Neat.row
-                (Neat.defaultRow
-                    |> Neat.alignRight
+                -- |> Boundary.setMinHeightInEm 10
+                |> Boundary.setMaxHeightInEm 25
+                -- |> Boundary.setMaxWidthInEm 35
+                |> Boundary.setMaxWidthInfinite
+                |> Boundary.setMinWidthInEm 16
+                |> Boundary.setGap Gap.body
+                |> View.leftItem "sampleText"
+            , Boundary.empty
+                |> Boundary.setMinHeightInEm 5
+                |> Boundary.setMinWidthInEm 10
+                |> Boundary.setMaxWidthInEm 20
+                |> Boundary.setMaxHeightInfinite
+                |> Boundary.setMixin (Mixin.class "red")
+                |> Boundary.setGap Gap.body
+                |> View.leftItem "sampleBox"
+            , View.row
+                (View.defaultRow
+                    |> View.alignRight
                 )
-                [ Neat.empty
-                    |> Neat.setMinHeightInEm 5
-                    |> Neat.setMaxHeightInfinite
-                    |> Neat.setMinWidthInEm 12
-                    |> Neat.setMaxWidthInEm 23
-                    |> Neat.setMixin (Mixin.class "blue")
-                    |> Neat.setGap Gap.body
-                    |> Neat.grownBottomItem "sampleBox"
+                [ Boundary.empty
+                    |> Boundary.setMinHeightInEm 5
+                    |> Boundary.setMaxHeightInfinite
+                    |> Boundary.setMinWidthInEm 12
+                    |> Boundary.setMaxWidthInEm 23
+                    |> Boundary.setMixin (Mixin.class "blue")
+                    |> Boundary.setGap Gap.body
+                    |> View.grownBottomItem "sampleBox"
                 ]
-                |> Neat.setBoundary
-                |> Neat.setMixin (Mixin.class "red")
-                |> Neat.setMinWidthInEm 37
-                |> Neat.setMaxWidthInEm 40
-                |> Neat.setMaxHeightInEm 33
+                |> View.setBoundary
+                |> Boundary.setMixin (Mixin.class "red")
+                |> Boundary.setMinWidthInEm 37
+                |> Boundary.setMaxWidthInEm 40
+                |> Boundary.setMaxHeightInEm 33
                 |> Neat.putLayer "overlay"
                     ( { top = 50
                       , bottom = 0
@@ -135,34 +137,34 @@ body _ =
                       , right = 50
                       , priority = Nothing
                       }
-                    , Neat.empty
-                        |> Neat.setMaxHeightInfinite
-                        |> Neat.setMaxWidthInEm 20
-                        |> Neat.setMixin (Mixin.class "red")
+                    , Boundary.empty
+                        |> Boundary.setMaxHeightInfinite
+                        |> Boundary.setMaxWidthInEm 20
+                        |> Boundary.setMixin (Mixin.class "red")
                         |> Neat.toLayered
                     )
-                |> Neat.setGap Gap.body
-                |> Neat.grownCenterItem "sampleNestedBox"
+                |> Boundary.setGap Gap.body
+                |> View.grownCenterItem "sampleNestedBox"
             ]
-            |> Neat.setBoundary
-            -- |> Neat.setMaxHeightInfinite
-            |> Neat.setMinHeightInEm 10
-            |> Neat.setMaxWidthInfinite
-            |> Neat.enableVerticalScroll
-            |> Neat.setMixin (Mixin.class "blue")
-            |> Neat.setGap Neat.noGap
-            |> Neat.grownRightItem "body"
-        , Neat.textBlock "Footer"
-            |> Neat.setGap Gap.body
-            |> Neat.setBoundary
-            |> Neat.setMaxWidthInfinite
-            |> Neat.setMixin (Mixin.class "footer")
-            |> Neat.setGap Neat.noGap
-            |> Neat.rightItem "footer"
+            |> View.setBoundary
+            -- |> Boundary.setMaxHeightInfinite
+            |> Boundary.setMinHeightInEm 10
+            |> Boundary.setMaxWidthInfinite
+            |> Boundary.enableVerticalScroll
+            |> Boundary.setMixin (Mixin.class "blue")
+            |> Boundary.setGap Neat.noGap
+            |> View.grownRightItem "body"
+        , Boundary.textBlock "Footer"
+            |> Boundary.setGap Gap.body
+            |> View.setBoundary
+            |> Boundary.setMaxWidthInfinite
+            |> Boundary.setMixin (Mixin.class "footer")
+            |> Boundary.setGap Neat.noGap
+            |> View.rightItem "footer"
         ]
-        |> Neat.setBoundary
-        |> Neat.setMaxHeightInfinite
-        |> Neat.setMaxWidthInfinite
+        |> View.setBoundary
+        |> Boundary.setMaxHeightInfinite
+        |> Boundary.setMaxWidthInfinite
 
 
 subscriptions : Model -> Sub Msg

@@ -46,12 +46,18 @@ config =
     , NoUnused.Exports.rule
         |> Rule.ignoreErrorsForDirectories
             [ "tests/VerifyExamples"
+            , "src/Neat"
             ]
         |> Rule.ignoreErrorsForFiles
             [ "src/Neat.elm"
-            , "src/Neat/Text.elm"
             ]
     , NoUnused.Modules.rule
+        |> Rule.ignoreErrorsForDirectories
+            [ "src/Neat"
+            ]
+        |> Rule.ignoreErrorsForFiles
+            [ "src/Neat.elm"
+            ]
     , NoUnused.Parameters.rule
     , NoUnused.Patterns.rule
     , NoUnused.Variables.rule

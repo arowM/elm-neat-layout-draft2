@@ -52,13 +52,15 @@ This module is for creating special texts. e.g., text that has links only to par
 
 import Html exposing (Attribute)
 import Mixin exposing (Mixin)
-import Neat.Text.Internal exposing (InlineNode)
 
 
 {-| Representing a text.
 -}
 type alias Text msg =
-    InlineNode msg
+    { mixin : Mixin msg
+    , nodeName : String
+    , text : String
+    }
 
 
 

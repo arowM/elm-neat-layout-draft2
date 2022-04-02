@@ -10,18 +10,18 @@ module Gap exposing
 
 -}
 
-import Neat exposing (IsGap(..))
+import Neat exposing (IsGap)
 
 
 {-| -}
 type Body
-    = Body
+    = Body Never
 
 
 {-| -}
 body : IsGap Body
 body =
-    IsGap
+    Neat.customGap
         { vertical = 0.6
         , horizontal = 0.6
         }

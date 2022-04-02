@@ -130,7 +130,7 @@ body _ =
                 |> Boundary.setMinWidthInEm 37
                 |> Boundary.setMaxWidthInEm 40
                 |> Boundary.setMaxHeightInEm 33
-                |> Neat.putLayer "overlay"
+                |> Boundary.putLayer "overlay"
                     ( { top = 50
                       , bottom = 0
                       , left = 0
@@ -141,7 +141,7 @@ body _ =
                         |> Boundary.setMaxHeightInfinite
                         |> Boundary.setMaxWidthInEm 20
                         |> Boundary.setMixin (Mixin.class "red")
-                        |> Neat.toLayered
+                        |> Boundary.toLayered
                     )
                 |> Boundary.setGap Gap.body
                 |> View.grownCenterItem "sampleNestedBox"

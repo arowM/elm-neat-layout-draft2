@@ -7,12 +7,6 @@ module Neat exposing
     , Renderer
     , defaultRenderer
     , setBaseSizeInRem
-    , putLayer
-    , Layer
-    , defaultLayer
-    , Layered
-    , mapLayered
-    , toLayered
     , when
     , unless
     , withMaybe
@@ -38,16 +32,6 @@ module Neat exposing
 @docs Renderer
 @docs defaultRenderer
 @docs setBaseSizeInRem
-
-
-# Overlay
-
-@docs putLayer
-@docs Layer
-@docs defaultLayer
-@docs Layered
-@docs mapLayered
-@docs toLayered
 
 
 # Handle conditions
@@ -375,7 +359,6 @@ type alias Column =
 
 
 
--- Setter
 -- Sizing
 
 
@@ -400,7 +383,6 @@ minHeightZero minHeight =
 
 
 
--- Gap
 -- Render
 
 
@@ -1051,83 +1033,6 @@ renderOverlay renderer overlay =
 class : String -> Mixin msg
 class str =
     Mixin.class <| "elmNeatLayout--" ++ str
-
-
-
--- Low level function for HTML
--- Layer
-
-
-{-| Set the position of each edge of the overlay layer as a percentage of the base view.
-
-The `priority` field specifies how much the element is superimposed on the front side in preference to other elements. If given `Nothing`, it is set equivalent priority comparing to other elements.
-
--}
-type alias Layer =
-    { top : Float
-    , bottom : Float
-    , left : Float
-    , right : Float
-    , priority : Maybe Int
-    }
-
-
-{-|
-
-    defaultLayer
-    --> { top = 0
-    --> , bottom = 0
-    --> , left = 0
-    --> , right = 0
-    --> , priority = Nothing
-    --> }
-
--}
-defaultLayer : Layer
-defaultLayer =
-    { top = 0
-    , bottom = 0
-    , left = 0
-    , right = 0
-    , priority = Nothing
-    }
-
-
-{-| Put overlay layer on the parent view.
--}
-putLayer : String -> ( Layer, Boundary (Layered msg) ) -> Boundary msg -> Boundary msg
-putLayer name ( area, layered ) (Boundary boundary) =
-    Boundary
-        { boundary
-            | overlays =
-                { name = name
-                , area = area
-                , boundary = mapBoundary (\(Layered a) -> a) layered
-                }
-                    :: boundary.overlays
-        }
-
-
-{-| -}
-type alias Layered msg =
-    Internal.Layered msg
-
-
-{-| -}
-mapLayered : (a -> b) -> Boundary (Layered a) -> Boundary (Layered b)
-mapLayered f =
-    mapBoundary (\(Layered a) -> Layered <| f a)
-
-
-{-| Convert `Boundary` for `putLayer`. The `Boundary (Layered msg)` ignores pointer events; this feature is especially helpfull for realizing popups with clickable background.
--}
-toLayered : Boundary msg -> Boundary (Layered msg)
-toLayered (Boundary boundary) =
-    Boundary
-        { boundary
-            | enforcePointerEvent = True
-        }
-        |> mapBoundary Layered
 
 
 

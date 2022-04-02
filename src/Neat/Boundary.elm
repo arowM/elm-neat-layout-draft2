@@ -27,6 +27,12 @@ module Neat.Boundary exposing
     , setMaxHeightInRem
     , enableVerticalScroll
     , enableHorizontalScroll
+    , putLayer
+    , Layer
+    , defaultLayer
+    , Layered
+    , mapLayered
+    , toLayered
     , setGap
     , setNodeName
     , html
@@ -140,6 +146,16 @@ The initial value for maximum height is _fit_, which shrinks as much as its chil
 @docs enableHorizontalScroll
 
 
+# Overlay
+
+@docs putLayer
+@docs Layer
+@docs defaultLayer
+@docs Layered
+@docs mapLayered
+@docs toLayered
+
+
 # Convert to `View`
 
 @docs setGap
@@ -166,6 +182,7 @@ import Neat.Internal as Internal
         , Gap
         , IsGap(..)
         , Item_
+        , Layered(..)
         , MaxHeight(..)
         , MaxWidth(..)
         , MinHeight(..)
@@ -634,6 +651,82 @@ enableHorizontalScroll (Boundary boundary) =
         { boundary
             | horizontalOverflow = True
         }
+
+
+
+-- Overlay
+
+
+{-| Set the position of each edge of the overlay layer as a percentage of the base view.
+
+The `priority` field specifies how much the element is superimposed on the front side in preference to other elements. If given `Nothing`, it is set equivalent priority comparing to other elements.
+
+-}
+type alias Layer =
+    { top : Float
+    , bottom : Float
+    , left : Float
+    , right : Float
+    , priority : Maybe Int
+    }
+
+
+{-|
+
+    defaultLayer
+    --> { top = 0
+    --> , bottom = 0
+    --> , left = 0
+    --> , right = 0
+    --> , priority = Nothing
+    --> }
+
+-}
+defaultLayer : Layer
+defaultLayer =
+    { top = 0
+    , bottom = 0
+    , left = 0
+    , right = 0
+    , priority = Nothing
+    }
+
+
+{-| Put overlay layer on the parent view.
+-}
+putLayer : String -> ( Layer, Boundary (Layered msg) ) -> Boundary msg -> Boundary msg
+putLayer name ( area, layered ) (Boundary boundary) =
+    Boundary
+        { boundary
+            | overlays =
+                { name = name
+                , area = area
+                , boundary = mapBoundary (\(Layered a) -> a) layered
+                }
+                    :: boundary.overlays
+        }
+
+
+{-| -}
+type alias Layered msg =
+    Internal.Layered msg
+
+
+{-| -}
+mapLayered : (a -> b) -> Boundary (Layered a) -> Boundary (Layered b)
+mapLayered f =
+    mapBoundary (\(Layered a) -> Layered <| f a)
+
+
+{-| Convert `Boundary` for `putLayer`. The `Boundary (Layered msg)` ignores pointer events; this feature is especially helpfull for realizing popups with clickable background.
+-}
+toLayered : Boundary msg -> Boundary (Layered msg)
+toLayered (Boundary boundary) =
+    Boundary
+        { boundary
+            | enforcePointerEvent = True
+        }
+        |> mapBoundary Layered
 
 
 

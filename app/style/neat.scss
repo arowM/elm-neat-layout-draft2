@@ -61,10 +61,12 @@
 
       &-verticalScroll > #{$boundaryContent} {
         height: auto;
+        min-height: 100%;
       }
 
       &-horizontalScroll > #{$boundaryContent} {
         width: auto;
+        min-width: 100%;
       }
     }
 

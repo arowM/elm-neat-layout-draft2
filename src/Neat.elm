@@ -715,10 +715,19 @@ renderBoundary renderer { self } o =
                         )
                     ]
 
+            else if content == None then
+                Mixin.keyed o.nodeName
+                    [ base
+                    , class "boundary-view"
+                    , class "boundary-view-noContent"
+                    ]
+                    (List.map (renderOverlay renderer) overlays)
+
             else
                 Mixin.keyed o.nodeName
                     [ base
                     , class "boundary-view"
+                    , class "boundary-view-hasContent"
                     ]
                     (( "content", render_ renderer childMixin content )
                         :: List.map (renderOverlay renderer) overlays

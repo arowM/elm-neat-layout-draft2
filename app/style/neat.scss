@@ -80,7 +80,7 @@
       }
     }
 
-    &-view,
+    &-view-hasContent,
     & > &_scroller {
       padding: var(--inner-gap-y) var(--inner-gap-x);
     }

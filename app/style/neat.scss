@@ -30,10 +30,6 @@
     left: 0;
     right: 0;
     overflow: hidden;
-    min-width: var(--min-height);
-    max-width: var(--max-height);
-    min-height: var(--min-height);
-    max-height: var(--max-height);
   }
 
   &--overlay {
@@ -46,10 +42,6 @@
     right: var(--overlay-right);
     z-index: var(--overlay-priority);
     overflow: hidden;
-    min-width: var(--min-width);
-    max-width: var(--max-width);
-    min-height: var(--min-height);
-    max-height: var(--max-height);
   }
 
   &--boundary {
@@ -106,48 +98,45 @@
       }
     }
 
-    &#{$rowChild},
-    &#{$columnChild} {
-      &#{$heightFlex} {
-        min-height: var(--min-height);
+    &#{$heightFlex} {
+      min-height: var(--min-height);
 
-        &#{$boundary}-hasMaxHeight {
-          max-height: var(--max-height);
-        }
+      &#{$boundary}-hasMaxHeight {
+        max-height: var(--max-height);
       }
+    }
 
-      &#{$widthFlex} {
-        min-width: var(--min-width);
+    &#{$widthFlex} {
+      min-width: var(--min-width);
 
-        &#{$boundary}-hasMaxWidth {
-          max-width: var(--max-width);
-        }
+      &#{$boundary}-hasMaxWidth {
+        max-width: var(--max-width);
       }
+    }
 
-      &#{$heightMaxSize}#{$boundary}-hasMaxHeight {
-        height: var(--max-height);
+    &#{$heightMaxSize}#{$boundary}-hasMaxHeight {
+      height: var(--max-height);
+    }
+
+    &#{$widthMaxSize}#{$boundary}-hasMaxWidth {
+      width: var(--max-width);
+    }
+
+    &#{$heightMinSize}#{$boundary} {
+      height: auto;
+      min-height: var(--min-height);
+
+      &-verticalOverflow {
+        height: var(--min-height);
       }
+    }
 
-      &#{$widthMaxSize}#{$boundary}-hasMaxWidth {
-        width: var(--max-width);
-      }
+    &#{$widthMinSize}#{$boundary} {
+      width: auto;
+      min-width: var(--min-width);
 
-      &#{$heightMinSize}#{$boundary} {
-        height: auto;
-        min-height: var(--min-height);
-
-        &-verticalOverflow {
-          height: var(--min-height);
-        }
-      }
-
-      &#{$widthMinSize}#{$boundary} {
-        width: auto;
-        min-width: var(--min-width);
-
-        &-horizontalOverflow {
-          width: var(--min-width);
-        }
+      &-horizontalOverflow {
+        width: var(--min-width);
       }
     }
   }

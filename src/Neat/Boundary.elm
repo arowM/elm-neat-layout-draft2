@@ -8,6 +8,8 @@ module Neat.Boundary exposing
     , setMixins
     , setAttribute
     , setAttributes
+    , setClass
+    , setId
     , setRole
     , setAria
     , setBoolAria
@@ -87,6 +89,8 @@ The following styles are not reflected by the `style` attribute or CSS files.
 @docs setMixins
 @docs setAttribute
 @docs setAttributes
+@docs setClass
+@docs setId
 
 
 # WAI-ARIA
@@ -449,6 +453,20 @@ setAttribute attr =
 setAttributes : List (Attribute msg) -> Boundary msg -> Boundary msg
 setAttributes attrs =
     setMixin <| Mixin.fromAttributes attrs
+
+
+{-| Append `class` attribute.
+-}
+setClass : String -> Boundary msg -> Boundary msg
+setClass =
+    setMixin << Mixin.class
+
+
+{-| Append `id` attribute.
+-}
+setId : String -> Boundary msg -> Boundary msg
+setId =
+    setMixin << Mixin.id
 
 
 {-| Set "role" value for WAI-ARIA.

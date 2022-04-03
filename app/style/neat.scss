@@ -59,16 +59,12 @@
       height: 100%;
       width: 100%;
 
-      &-verticalScroll > #{$boundaryContent}::after {
-        display: block;
-        content: "";
-        padding-top: 0.02px;
+      &-verticalScroll > #{$boundaryContent} {
+        height: auto;
       }
 
-      &-horizontalScroll > #{$boundaryContent}::after {
-        display: inline-block;
-        content: "";
-        padding-left: 0.02px;
+      &-horizontalScroll > #{$boundaryContent} {
+        width: auto;
       }
     }
 

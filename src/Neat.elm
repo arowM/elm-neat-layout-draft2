@@ -441,26 +441,23 @@ preprocessHeight boundary =
                         , height = size
                     }
             in
-            case ( boundary.verticalOverflow, ( boundary.maxHeight, minHeightZero boundary.minHeight ), boundary.height ) of
+            case ( boundary.verticalOverflow, boundary.maxHeight, boundary.height ) of
                 ( True, _, _ ) ->
                     helper FlexSize
 
-                ( False, ( MaxHeightNone, _ ), MinSize ) ->
+                ( False, MaxHeightNone, MinSize ) ->
                     helper MinSize
 
-                ( False, ( MaxHeightNone, _ ), FlexSize ) ->
+                ( False, MaxHeightNone, FlexSize ) ->
                     helper FlexSize
 
-                ( False, ( MaxHeightFit, True ), _ ) ->
+                ( False, MaxHeightFit, _ ) ->
                     helper MinSize
 
-                ( False, ( MaxHeightFit, False ), _ ) ->
+                ( False, MaxHeightInBs _, _ ) ->
                     helper FlexSize
 
-                ( False, ( MaxHeightInBs _, _ ), _ ) ->
-                    helper FlexSize
-
-                ( False, ( MaxHeightInUnit _ _, _ ), _ ) ->
+                ( False, MaxHeightInUnit _ _, _ ) ->
                     helper FlexSize
 
 
@@ -483,8 +480,11 @@ setHeight size view =
                             , height = s
                         }
             in
-            case size of
-                MinSize ->
+            case (size, row_.children) of
+                (MinSize, Children _ []) ->
+                    helper MinSize
+
+                (MinSize, Children _ _) ->
                     helper FlexSize
 
                 _ ->
@@ -541,26 +541,23 @@ preprocessWidth boundary =
                         , width = prodSize boundary.width size
                     }
             in
-            case ( boundary.horizontalOverflow, ( boundary.maxWidth, minWidthZero boundary.minWidth ), boundary.width ) of
+            case ( boundary.horizontalOverflow, boundary.maxWidth, boundary.width ) of
                 ( True, _, _ ) ->
                     helper FlexSize
 
-                ( False, ( MaxWidthNone, _ ), MinSize ) ->
+                ( False, MaxWidthNone, MinSize ) ->
                     helper MinSize
 
-                ( False, ( MaxWidthNone, _ ), FlexSize ) ->
+                ( False, MaxWidthNone, FlexSize ) ->
                     helper FlexSize
 
-                ( False, ( MaxWidthFit, True ), _ ) ->
+                ( False, MaxWidthFit, _ ) ->
                     helper MinSize
 
-                ( False, ( MaxWidthFit, False ), _ ) ->
+                ( False, MaxWidthInBs _, _ ) ->
                     helper FlexSize
 
-                ( False, ( MaxWidthInBs _, _ ), _ ) ->
-                    helper FlexSize
-
-                ( False, ( MaxWidthInUnit _ _, _ ), _ ) ->
+                ( False, MaxWidthInUnit _ _, _ ) ->
                     helper FlexSize
 
 
@@ -596,8 +593,11 @@ setWidth size view =
                             , width = s
                         }
             in
-            case size of
-                MinSize ->
+            case (size, column_.children) of
+                (MinSize, Children _ []) ->
+                    helper MinSize
+
+                (MinSize, Children _ _) ->
                     helper FlexSize
 
                 _ ->
@@ -679,6 +679,16 @@ renderBoundary renderer { self } o =
                     Mixin.none
                 , if o.maxWidth /= MaxWidthNone then
                     class "boundary-hasMaxWidth"
+
+                  else
+                    Mixin.none
+                , if not (minHeightZero o.minHeight) then
+                    class "boundary-hasMinHeight"
+
+                  else
+                    Mixin.none
+                , if not (minWidthZero o.minWidth) then
+                    class "boundary-hasMinWidth"
 
                   else
                     Mixin.none

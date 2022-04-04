@@ -97,7 +97,9 @@
     }
 
     &#{$heightFlex} {
-      min-height: var(--min-height);
+      &#{$boundary}-hasMinHeight {
+        min-height: var(--min-height);
+      }
 
       &#{$boundary}-hasMaxHeight {
         max-height: var(--max-height);
@@ -105,7 +107,9 @@
     }
 
     &#{$widthFlex} {
-      min-width: var(--min-width);
+      &#{$boundary}-hasMinWidth {
+        min-width: var(--min-width);
+      }
 
       &#{$boundary}-hasMaxWidth {
         max-width: var(--max-width);
@@ -122,19 +126,37 @@
 
     &#{$heightMinSize}#{$boundary} {
       height: auto;
-      min-height: var(--min-height);
+
+      &-hasMinHeight {
+        min-height: var(--min-height);
+      }
 
       &-verticalOverflow {
-        height: var(--min-height);
+        height: auto;
+        max-height: 100%;
+        overflow-y: auto;
+
+        &#{$boundary}-hasMaxHeight {
+          max-height: min(var(--max-height), 100%);
+        }
       }
     }
 
     &#{$widthMinSize}#{$boundary} {
       width: auto;
-      min-width: var(--min-width);
+
+      &-hasMinWidth {
+        min-width: var(--min-width);
+      }
 
       &-horizontalOverflow {
-        width: var(--min-width);
+        width: auto;
+        max-width: 100%;
+        overflow-x: auto;
+
+        &#{$boundary}-hasMaxWidth {
+          max-width: min(var(--max-width), 100%);
+        }
       }
     }
   }
@@ -245,7 +267,10 @@
 
     &#{$boundary}#{$heightMinSize} {
       height: auto;
-      min-height: var(--min-height);
+
+      &-hasMinHeight {
+        min-height: var(--min-height);
+      }
     }
 
     &#{$boundary}#{$widthFlex} {
@@ -258,7 +283,10 @@
 
     &#{$boundary}#{$widthMinSize} {
       width: auto;
-      min-width: var(--min-width);
+
+      &-hasMinWidth {
+        min-width: var(--min-width);
+      }
     }
   }
 

@@ -1,16 +1,21 @@
 module Neat.Text exposing
     ( Text
+    , map
     , fromString
-    , none
     , setMixin
     , setMixins
     , setAttribute
     , setAttributes
+    , setClass
+    , setId
+    , setRole
+    , setAria
+    , setBoolAria
+    , none
     , when
     , unless
     , withMaybe
     , setNodeName
-    , map
     )
 
 {-| Module for inline texts.
@@ -20,12 +25,12 @@ This module is for creating special texts. e.g., text that has links only to par
 # Core
 
 @docs Text
+@docs map
 
 
 # Primitive constructors
 
 @docs fromString
-@docs none
 
 
 # Attributes
@@ -34,10 +39,20 @@ This module is for creating special texts. e.g., text that has links only to par
 @docs setMixins
 @docs setAttribute
 @docs setAttributes
+@docs setClass
+@docs setId
+
+
+# WAI-ARIA
+
+@docs setRole
+@docs setAria
+@docs setBoolAria
 
 
 # Handle conditions
 
+@docs none
 @docs when
 @docs unless
 @docs withMaybe
@@ -46,7 +61,6 @@ This module is for creating special texts. e.g., text that has links only to par
 # Lower level functions for HTML
 
 @docs setNodeName
-@docs map
 
 -}
 
@@ -134,6 +148,50 @@ setAttribute attr =
 setAttributes : List (Attribute msg) -> Text msg -> Text msg
 setAttributes =
     setMixin << Mixin.fromAttributes
+
+
+{-| Append `class` attribute.
+-}
+setClass : String -> Text msg -> Text msg
+setClass =
+    setMixin << Mixin.class
+
+
+{-| Append `id` attribute.
+-}
+setId : String -> Text msg -> Text msg
+setId =
+    setMixin << Mixin.id
+
+
+{-| Set "role" value for WAI-ARIA.
+-}
+setRole : String -> Text msg -> Text msg
+setRole str =
+    setMixin <| Mixin.attribute "role" str
+
+
+{-| Set "aria-\*" value for WAI-ARIA.
+
+e.g., `setAria "required" "true"` stands for "aria-required" is "true".
+
+-}
+setAria : String -> String -> Text msg -> Text msg
+setAria name v =
+    setMixin <| Mixin.attribute ("aria-" ++ name) v
+
+
+{-| Set boolean "aria-\*" value for WAI-ARIA.
+
+i.e.,
+
+  - `setBoolAria name True` is equal to `setAria name "true"`
+  - `setBoolAria name False` is equal to `setAria name "false"`
+
+-}
+setBoolAria : String -> Bool -> Text msg -> Text msg
+setBoolAria name g =
+    setMixin <| Mixin.boolAttribute ("aria-" ++ name) g
 
 
 

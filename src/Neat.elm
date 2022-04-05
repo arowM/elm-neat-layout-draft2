@@ -565,26 +565,30 @@ renderBoundary renderer { self } o =
                     ]
 
         TextsContent texts ->
-            texts
-                |> List.indexedMap
-                    (\n inline ->
-                        ( "content" ++ String.fromInt n
-                        , Mixin.node inline.nodeName
-                            [ inline.mixin
-                            , class "boundary_text"
-                            ]
-                            [ Html.text inline.text
-                            ]
+            Mixin.node o.nodeName
+                [ base
+                , class "boundary-text"
+                ]
+                [ texts
+                    |> List.indexedMap
+                        (\n inline ->
+                            ( "content" ++ String.fromInt n
+                            , Mixin.node inline.nodeName
+                                [ inline.mixin
+                                , class "boundary_text"
+                                ]
+                                [ Html.text inline.text
+                                ]
+                            )
                         )
-                    )
-                |> (\children ->
-                        children
-                            ++ List.map (renderOverlay renderer) overlays
-                   )
-                |> Mixin.keyed o.nodeName
-                    [ base
-                    , class "boundary-text"
-                    ]
+                    |> (\children ->
+                            children
+                                ++ List.map (renderOverlay renderer) overlays
+                       )
+                    |> Mixin.keyed "div"
+                        [ class "boundary_textMargin"
+                        ]
+                ]
 
         StringContent str ->
             Mixin.node o.nodeName

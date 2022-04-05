@@ -73,7 +73,9 @@
       padding: var(--inner-gap-y) var(--inner-gap-x);
     }
 
-    &-text {
+    &-text > &_textMargin {
+      height: 100%;
+      width: 100%;
       margin: calc(var(--outer-gap-y) / -2) 0;
 
       & > #{$boundary}_text {

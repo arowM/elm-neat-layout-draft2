@@ -167,8 +167,6 @@ map_ f view =
                 , justifyContent = o.justifyContent
                 , children = modifyChild (map_ f) o.children
                 , wrap = o.wrap
-                , height = o.height
-                , width = o.width
                 }
 
         FromColumn o ->
@@ -178,8 +176,6 @@ map_ f view =
                 , nodeName = o.nodeName
                 , justifyContent = o.justifyContent
                 , children = modifyChild (map_ f) o.children
-                , height = o.height
-                , width = o.width
                 }
 
         None ->
@@ -411,200 +407,8 @@ render (Renderer renderer) (Boundary boundary) =
             | height = FlexSize
             , width = FlexSize
           }
-            |> preprocessHeight
-            |> preprocessWidth
             |> renderBoundary renderer childMixin
         ]
-
-
-preprocessHeight : Boundary_ msg -> Boundary_ msg
-preprocessHeight boundary =
-    case boundary.content of
-        NoContent ->
-            boundary
-
-        StringContent _ ->
-            boundary
-
-        TextsContent _ ->
-            boundary
-
-        HtmlContent _ ->
-            boundary
-
-        ViewContent view ->
-            let
-                helper : Size -> Boundary_ msg
-                helper size =
-                    { boundary
-                        | content = ViewContent <| setHeight size view
-                        , height = size
-                    }
-            in
-            case ( boundary.verticalOverflow, boundary.maxHeight, boundary.height ) of
-                ( True, _, _ ) ->
-                    helper FlexSize
-
-                ( False, MaxHeightNone, MinSize ) ->
-                    helper MinSize
-
-                ( False, MaxHeightNone, FlexSize ) ->
-                    helper FlexSize
-
-                ( False, MaxHeightFit, _ ) ->
-                    helper MinSize
-
-                ( False, MaxHeightInBs _, _ ) ->
-                    helper FlexSize
-
-                ( False, MaxHeightInUnit _ _, _ ) ->
-                    helper FlexSize
-
-
-setHeight : Size -> View_ msg -> View_ msg
-setHeight size view =
-    case view of
-        FromBoundary boundary ->
-            FromBoundary <|
-                preprocessHeight
-                    { boundary
-                        | height = prodSize boundary.height size
-                    }
-
-        FromRow row_ ->
-            let
-                helper s =
-                    FromRow
-                        { row_
-                            | children = modifyChild (setHeight s) row_.children
-                            , height = s
-                        }
-            in
-            case (size, row_.children) of
-                (MinSize, Children _ []) ->
-                    helper MinSize
-
-                (MinSize, Children _ _) ->
-                    helper FlexSize
-
-                _ ->
-                    helper size
-
-        FromColumn column_ ->
-            FromColumn
-                { column_
-                    | children =
-                        modifyChild
-                            (setHeight size)
-                            column_.children
-                    , height = size
-                }
-
-        None ->
-            None
-
-
-prodSize : Size -> Size -> Size
-prodSize sa sb =
-    case ( sa, sb ) of
-        ( MinSize, _ ) ->
-            MinSize
-
-        ( _, MinSize ) ->
-            MinSize
-
-        ( FlexSize, FlexSize ) ->
-            FlexSize
-
-
-preprocessWidth : Boundary_ msg -> Boundary_ msg
-preprocessWidth boundary =
-    case boundary.content of
-        NoContent ->
-            boundary
-
-        StringContent _ ->
-            boundary
-
-        TextsContent _ ->
-            boundary
-
-        HtmlContent _ ->
-            boundary
-
-        ViewContent view ->
-            let
-                helper : Size -> Boundary_ msg
-                helper size =
-                    { boundary
-                        | content = ViewContent <| setWidth size view
-                        , width = prodSize boundary.width size
-                    }
-            in
-            case ( boundary.horizontalOverflow, boundary.maxWidth, boundary.width ) of
-                ( True, _, _ ) ->
-                    helper FlexSize
-
-                ( False, MaxWidthNone, MinSize ) ->
-                    helper MinSize
-
-                ( False, MaxWidthNone, FlexSize ) ->
-                    helper FlexSize
-
-                ( False, MaxWidthFit, _ ) ->
-                    helper MinSize
-
-                ( False, MaxWidthInBs _, _ ) ->
-                    helper FlexSize
-
-                ( False, MaxWidthInUnit _ _, _ ) ->
-                    helper FlexSize
-
-
-setWidth : Size -> View_ msg -> View_ msg
-setWidth size view =
-    case view of
-        FromBoundary boundary ->
-            FromBoundary <|
-                preprocessWidth
-                    { boundary
-                        | width = size
-                    }
-
-        FromRow row_ ->
-            FromRow
-                { row_
-                    | children =
-                        modifyChild
-                            (setWidth size)
-                            row_.children
-                    , width = size
-                }
-
-        FromColumn column_ ->
-            let
-                helper s =
-                    FromColumn
-                        { column_
-                            | children =
-                                modifyChild
-                                    (setWidth s)
-                                    column_.children
-                            , width = s
-                        }
-            in
-            case (size, column_.children) of
-                (MinSize, Children _ []) ->
-                    helper MinSize
-
-                (MinSize, Children _ _) ->
-                    helper FlexSize
-
-                _ ->
-                    helper size
-
-        None ->
-            None
 
 
 type alias ChildMixin msg =
@@ -672,12 +476,12 @@ renderBoundary renderer { self } o =
 
                   else
                     Mixin.none
-                , if o.maxHeight /= MaxHeightNone then
+                , if hasMaxHeight o.maxHeight then
                     class "boundary-hasMaxHeight"
 
                   else
                     Mixin.none
-                , if o.maxWidth /= MaxWidthNone then
+                , if hasMaxWidth o.maxWidth then
                     class "boundary-hasMaxWidth"
 
                   else
@@ -790,6 +594,32 @@ renderBoundary renderer { self } o =
                 ]
 
 
+hasMaxHeight : MaxHeight -> Bool
+hasMaxHeight mh =
+    case mh of
+        MaxHeightInBs _ ->
+            True
+
+        MaxHeightInUnit _ _ ->
+            True
+
+        _ ->
+            False
+
+
+hasMaxWidth : MaxWidth -> Bool
+hasMaxWidth mw =
+    case mw of
+        MaxWidthInBs _ ->
+            True
+
+        MaxWidthInUnit _ _ ->
+            True
+
+        _ ->
+            False
+
+
 boundaryCustomProperty : Renderer_ -> Boundary_ msg -> Mixin msg
 boundaryCustomProperty renderer o =
     Mixin.batch
@@ -864,18 +694,6 @@ renderRow renderer { inherit, self } o =
         base =
             Mixin.batch
                 [ o.mixin
-                , case o.height of
-                    MinSize ->
-                        class "heightMinSize"
-
-                    FlexSize ->
-                        class "heightFlex"
-                , case o.width of
-                    MinSize ->
-                        class "widthMinSize"
-
-                    FlexSize ->
-                        class "widthFlex"
                 , self
                 , class "row"
                 , if o.wrap then
@@ -943,18 +761,6 @@ renderColumn renderer { inherit, self } o =
         base =
             Mixin.batch
                 [ o.mixin
-                , case o.height of
-                    MinSize ->
-                        class "heightMinSize"
-
-                    FlexSize ->
-                        class "heightFlex"
-                , case o.width of
-                    MinSize ->
-                        class "widthMinSize"
-
-                    FlexSize ->
-                        class "widthFlex"
                 , self
                 , class "column"
                 , case o.justifyContent of
@@ -1043,8 +849,6 @@ renderOverlay renderer overlay =
         | height = FlexSize
         , width = FlexSize
       }
-        |> preprocessHeight
-        |> preprocessWidth
         |> renderBoundary renderer childMixin
     )
 

@@ -190,8 +190,6 @@ map_ f view =
                 , justifyContent = o.justifyContent
                 , children = modifyChild (map_ f) o.children
                 , wrap = o.wrap
-                , height = o.height
-                , width = o.width
                 }
 
         FromColumn o ->
@@ -201,8 +199,6 @@ map_ f view =
                 , nodeName = o.nodeName
                 , justifyContent = o.justifyContent
                 , children = modifyChild (map_ f) o.children
-                , height = o.height
-                , width = o.width
                 }
 
         None ->
@@ -318,8 +314,6 @@ defaultRow_ children =
     , justifyContent = AlignStart
     , children = children
     , wrap = True
-    , width = FlexSize
-    , height = FlexSize
     }
 
 
@@ -330,8 +324,6 @@ defaultColumn_ children =
     , nodeName = "div"
     , justifyContent = AlignStart
     , children = children
-    , width = FlexSize
-    , height = FlexSize
     }
 
 

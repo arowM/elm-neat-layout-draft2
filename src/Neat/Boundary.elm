@@ -253,8 +253,6 @@ mapView_ f view =
                 , justifyContent = o.justifyContent
                 , children = modifyChild (mapView_ f) o.children
                 , wrap = o.wrap
-                , height = o.height
-                , width = o.width
                 }
 
         FromColumn o ->
@@ -264,8 +262,6 @@ mapView_ f view =
                 , nodeName = o.nodeName
                 , justifyContent = o.justifyContent
                 , children = modifyChild (mapView_ f) o.children
-                , height = o.height
-                , width = o.width
                 }
 
         None ->
@@ -606,7 +602,11 @@ setMaxWidthInRem =
 
 setMaxWidth : MaxWidth -> Boundary msg -> Boundary msg
 setMaxWidth length (Boundary boundary) =
-    Boundary { boundary | maxWidth = length }
+    Boundary
+        { boundary
+            | maxWidth = length
+            , width = FlexSize
+        }
 
 
 {-| Set the maximum height to _infinite_, which will be stretched vertically as much as it does not overhang the parent element.
@@ -646,7 +646,11 @@ setMaxHeightInRem =
 
 setMaxHeight : MaxHeight -> Boundary msg -> Boundary msg
 setMaxHeight length (Boundary boundary) =
-    Boundary { boundary | maxHeight = length }
+    Boundary
+        { boundary
+            | maxHeight = length
+            , height = FlexSize
+        }
 
 
 

@@ -8,10 +8,8 @@
   $column: #{$prefix}--column;
   $columnChild: #{$prefix}--columnChild;
   $heightFlex: #{$prefix}--heightFlex;
-  $heightMaxSize: #{$prefix}--heightMaxSize;
   $heightMinSize: #{$prefix}--heightMinSize;
   $widthFlex: #{$prefix}--widthFlex;
-  $widthMaxSize: #{$prefix}--widthMaxSize;
   $widthMinSize: #{$prefix}--widthMinSize;
 
   &,
@@ -85,74 +83,142 @@
     }
 
     &-horizontalOverflow {
+      overflow-x: auto;
+
       & > #{$boundary}_scroller {
         overflow-x: auto;
       }
     }
 
     &-verticalOverflow {
+      overflow-y: auto;
+
       & > #{$boundary}_scroller {
         overflow-y: auto;
       }
     }
 
-    &#{$heightFlex} {
-      &#{$boundary}-hasMinHeight {
-        min-height: var(--min-height);
+    &-hasMinHeight {
+      min-height: var(--min-height);
+    }
+
+    &-hasMaxHeight:not(#{$boundary}-verticalOverflow) {
+      max-height: var(--max-height);
+    }
+
+    &-hasMinWidth {
+      min-width: var(--min-width);
+    }
+
+    &-hasMaxWidth:not(#{$boundary}-horizontalOverflow) {
+      max-width: var(--max-width);
+    }
+
+    &#{$rowChild} {
+      width: auto;
+      flex-shrink: 0;
+
+      &#{$heightFlex}:not(#{$boundary}-verticalOverflow) {
+        height: 100%;
       }
 
-      &#{$boundary}-hasMaxHeight {
-        max-height: var(--max-height);
+      &#{$heightMinSize} {
+        height: auto;
+      }
+
+      &#{$boundary}-verticalOverflow {
+        &#{$heightFlex} {
+          height: 100%;
+
+          &#{$boundary}-hasMaxHeight {
+            max-height: var(--max-height);
+          }
+        }
+
+        &#{$heightMinSize} {
+          height: auto;
+          max-height: 100%;
+
+          &#{$boundary}-hasMaxHeight {
+            max-height: min(var(--max-height), 100%);
+          }
+        }
+      }
+
+      &#{$boundary}-horizontalOverflow {
+        flex-shrink: 1;
+
+        &#{$boundary}-hasMaxWidth {
+          max-width: var(--max-width);
+        }
       }
     }
 
-    &#{$widthFlex} {
-      &#{$boundary}-hasMinWidth {
-        min-width: var(--min-width);
-      }
-
-      &#{$boundary}-hasMaxWidth {
-        max-width: var(--max-width);
-      }
-    }
-
-    &#{$heightMaxSize}#{$boundary}-hasMaxHeight {
-      height: var(--max-height);
-    }
-
-    &#{$widthMaxSize}#{$boundary}-hasMaxWidth {
-      width: var(--max-width);
-    }
-
-    &#{$heightMinSize}#{$boundary} {
+    &#{$columnChild} {
       height: auto;
+      flex-shrink: 0;
 
-      &-hasMinHeight {
-        min-height: var(--min-height);
+      &#{$widthFlex}:not(#{$boundary}-horizontalOverflow) {
+        width: 100%;
+      }
+      &#{$widthMinSize} {
+        width: auto;
       }
 
-      &-verticalOverflow {
+      &#{$boundary}-horizontalOverflow {
+        &#{$widthFlex} {
+          width: 100%;
+
+          &#{$boundary}-hasMaxWidth {
+            max-width: var(--max-width);
+          }
+        }
+
+        &#{$widthMinSize} {
+          width: auto;
+          max-width: 100%;
+
+          &#{$boundary}-hasMaxWidth {
+            max-width: min(var(--max-width), 100%);
+          }
+        }
+      }
+
+      &#{$boundary}-verticalOverflow {
+        flex-shrink: 1;
+
+        &#{$boundary}-hasMaxHeight {
+          max-height: var(--max-height);
+        }
+      }
+    }
+
+    &#{$boundaryContent} {
+      &#{$heightFlex} {
+        height: 100%;
+      }
+      &#{$heightMinSize} {
+        height: auto;
+      }
+      &#{$widthFlex} {
+        width: 100%;
+      }
+      &#{$widthMinSize} {
+        width: auto;
+      }
+
+      &#{$boundary}-verticalOverflow {
         height: auto;
         max-height: 100%;
-        overflow-y: auto;
 
         &#{$boundary}-hasMaxHeight {
           max-height: min(var(--max-height), 100%);
         }
       }
-    }
 
-    &#{$widthMinSize}#{$boundary} {
-      width: auto;
-
-      &-hasMinWidth {
-        min-width: var(--min-width);
-      }
-
-      &-horizontalOverflow {
+      &#{$boundary}-horizontalOverflow {
         width: auto;
         max-width: 100%;
-        overflow-x: auto;
 
         &#{$boundary}-hasMaxWidth {
           max-width: min(var(--max-width), 100%);
@@ -183,28 +249,40 @@
     }
 
     & > #{$rowChild} {
-      width: auto;
       flex-grow: 0;
-      flex-shrink: 0;
 
       &#{$rowChild}-grow {
         flex-grow: 1;
       }
 
-      &#{$boundary}-horizontalOverflow {
-        flex-shrink: 1;
-        width: 0;
-      }
-
       &#{$rowChild}-alignStart {
         align-self: flex-start;
       }
+
       &#{$rowChild}-alignCenter {
         align-self: center;
       }
+
       &#{$rowChild}-alignEnd {
         align-self: flex-end;
       }
+    }
+
+    &#{$rowChild} {
+      width: auto;
+      height: auto;
+      flex-shrink: 0;
+    }
+
+    &#{$columnChild} {
+      height: auto;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    &#{$boundaryContent} {
+      width: 100%;
+      height: 100%;
     }
   }
 
@@ -224,21 +302,10 @@
     }
 
     & > #{$columnChild} {
-      height: auto;
       flex-grow: 0;
-      flex-shrink: 0;
-
-      &#{$boundary}-text {
-        width: auto;
-      }
 
       &#{$columnChild}-grow {
         flex-grow: 1;
-      }
-
-      &#{$boundary}-verticalOverflow {
-        flex-shrink: 1;
-        height: 0;
       }
 
       &#{$columnChild}-alignStart {
@@ -251,48 +318,22 @@
         align-self: flex-end;
       }
     }
-  }
 
-  &--boundaryContent {
-    height: 100%;
-    width: 100%;
-
-    &#{$boundary}#{$heightFlex} {
-      max-height: var(--max-height);
-    }
-
-    &#{$boundary}#{$heightMaxSize} {
-      height: var(--max-height);
-    }
-
-    &#{$boundary}#{$heightMinSize} {
-      height: auto;
-
-      &-hasMinHeight {
-        min-height: var(--min-height);
-      }
-    }
-
-    &#{$boundary}#{$widthFlex} {
-      max-width: var(--max-width);
-    }
-
-    &#{$boundary}#{$widthMaxSize} {
-      width: var(--max-width);
-    }
-
-    &#{$boundary}#{$widthMinSize} {
+    &#{$rowChild} {
       width: auto;
-
-      &-hasMinWidth {
-        min-width: var(--min-width);
-      }
+      height: 100%;
+      flex-shrink: 0;
     }
-  }
 
-  &--rowChild,
-  &--columnChild {
-    height: 100%;
-    width: 100%;
+    &#{$columnChild} {
+      height: auto;
+      width: auto;
+      flex-shrink: 0;
+    }
+
+    &#{$boundaryContent} {
+      width: 100%;
+      height: 100%;
+    }
   }
 }

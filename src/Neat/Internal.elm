@@ -98,8 +98,6 @@ type alias Row_ msg =
     , justifyContent : Alignment
     , children : Children msg
     , wrap : Bool
-    , width : Size
-    , height : Size
     }
 
 
@@ -115,8 +113,6 @@ type alias Column_ msg =
     , nodeName : String
     , justifyContent : Alignment
     , children : Children msg
-    , width : Size
-    , height : Size
     }
 
 

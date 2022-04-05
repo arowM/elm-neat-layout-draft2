@@ -84,6 +84,7 @@ body _ =
                 |> Boundary.setMinWidthInEm 3
                 |> Boundary.setMaxWidthInEm 3
                 |> Boundary.setMinHeightInEm 3
+                |> Boundary.setMaxHeightInEm 3
                 |> Boundary.setMixin (Mixin.class "header_hamburger")
                 |> Boundary.setGap Gap.body
                 |> View.middleItem "hamburger"

@@ -593,6 +593,7 @@ renderBoundary renderer { self } o =
         StringContent str ->
             Mixin.node o.nodeName
                 [ o.mixin
+                , base
                 ]
                 [ Html.text str
                 ]

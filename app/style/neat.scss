@@ -122,7 +122,7 @@
 
     &#{$rowChild} {
       width: auto;
-      flex-shrink: 0;
+      flex-shrink: 1;
 
       &#{$heightFlex}:not(#{$boundary}-verticalOverflow) {
         height: 100%;

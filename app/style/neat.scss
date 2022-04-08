@@ -73,6 +73,10 @@
       padding: var(--inner-gap-y) var(--inner-gap-x);
     }
 
+    &-text {
+      overflow: visible;
+    }
+
     &-text > &_textMargin {
       height: 100%;
       width: 100%;

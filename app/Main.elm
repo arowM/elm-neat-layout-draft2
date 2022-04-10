@@ -90,10 +90,9 @@ body _ =
                 |> View.middleItem "hamburger"
             ]
             |> View.setBoundary
-            |> Boundary.setMaxWidthInfinite
             |> Boundary.setMixin (Mixin.class "header")
             |> Boundary.setGap Neat.noGap
-            |> View.leftItem "header"
+            |> View.columnItem "header"
         , View.column
             View.defaultColumn
             [ Boundary.textBlock
@@ -101,30 +100,27 @@ body _ =
                 -- |> Boundary.setMinHeightInEm 10
                 |> Boundary.setMaxHeightInEm 25
                 -- |> Boundary.setMaxWidthInEm 35
-                |> Boundary.setMaxWidthInfinite
                 |> Boundary.setMinWidthInEm 16
                 |> Boundary.setGap Gap.body
-                |> View.leftItem "sampleText"
+                |> View.columnItem "sampleText"
             , Boundary.empty
                 |> Boundary.setMinHeightInEm 5
                 |> Boundary.setMinWidthInEm 10
                 |> Boundary.setMaxWidthInEm 20
-                |> Boundary.setMaxHeightInfinite
                 |> Boundary.setMixin (Mixin.class "red")
                 |> Boundary.setGap Gap.body
-                |> View.leftItem "sampleBox"
+                |> View.columnItem "sampleBox"
             , View.row
                 (View.defaultRow
                     |> View.alignRight
                 )
                 [ Boundary.empty
                     |> Boundary.setMinHeightInEm 5
-                    |> Boundary.setMaxHeightInfinite
                     |> Boundary.setMinWidthInEm 12
                     |> Boundary.setMaxWidthInEm 23
                     |> Boundary.setMixin (Mixin.class "blue")
                     |> Boundary.setGap Gap.body
-                    |> View.grownBottomItem "sampleBox"
+                    |> View.grownRowItem "sampleBox"
                 ]
                 |> View.setBoundary
                 |> Boundary.setMixin (Mixin.class "red")
@@ -139,7 +135,6 @@ body _ =
                       , priority = Nothing
                       }
                     , Boundary.empty
-                        |> Boundary.setMaxHeightInfinite
                         |> Boundary.setMaxWidthInEm 20
                         |> Boundary.setMixin (Mixin.class "red")
                         |> Boundary.toLayered
@@ -148,24 +143,19 @@ body _ =
                 |> View.grownCenterItem "sampleNestedBox"
             ]
             |> View.setBoundary
-            -- |> Boundary.setMaxHeightInfinite
             |> Boundary.setMinHeightInEm 10
-            |> Boundary.setMaxWidthInfinite
             |> Boundary.enableVerticalScroll
             |> Boundary.setMixin (Mixin.class "blue")
             |> Boundary.setGap Neat.noGap
-            |> View.grownRightItem "body"
+            |> View.grownColumnItem "body"
         , Boundary.textBlock "Footer"
             |> Boundary.setGap Gap.body
             |> View.setBoundary
-            |> Boundary.setMaxWidthInfinite
             |> Boundary.setMixin (Mixin.class "footer")
             |> Boundary.setGap Neat.noGap
-            |> View.rightItem "footer"
+            |> View.columnItem "footer"
         ]
         |> View.setBoundary
-        |> Boundary.setMaxHeightInfinite
-        |> Boundary.setMaxWidthInfinite
 
 
 subscriptions : Model -> Sub Msg

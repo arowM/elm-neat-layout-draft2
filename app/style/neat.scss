@@ -74,6 +74,12 @@
     }
 
     &-text {
+      overflow: visible;
+    }
+
+    &-text > &_textMargin {
+      height: 100%;
+      width: 100%;
       margin: calc(var(--outer-gap-y) / -2) 0;
 
       & > #{$boundary}_text {
@@ -116,10 +122,14 @@
 
     &#{$rowChild} {
       width: auto;
-      flex-shrink: 0;
+      flex-shrink: 1;
 
       &#{$heightFlex}:not(#{$boundary}-verticalOverflow) {
         height: 100%;
+
+        &#{$rowChild}-alignStretch {
+          height: auto;
+        }
       }
 
       &#{$heightMinSize} {
@@ -129,6 +139,10 @@
       &#{$boundary}-verticalOverflow {
         &#{$heightFlex} {
           height: 100%;
+
+          &#{$rowChild}-alignStretch {
+            height: auto;
+          }
 
           &#{$boundary}-hasMaxHeight {
             max-height: var(--max-height);
@@ -160,6 +174,10 @@
 
       &#{$widthFlex}:not(#{$boundary}-horizontalOverflow) {
         width: 100%;
+
+        &#{$columnChild}-alignStretch {
+          width: auto;
+        }
       }
       &#{$widthMinSize} {
         width: auto;
@@ -169,6 +187,9 @@
         &#{$widthFlex} {
           width: 100%;
 
+          &#{$columnChild}-alignStretch {
+            width: auto;
+          }
           &#{$boundary}-hasMaxWidth {
             max-width: var(--max-width);
           }
@@ -266,6 +287,10 @@
       &#{$rowChild}-alignEnd {
         align-self: flex-end;
       }
+
+      &#{$rowChild}-alignStretch {
+        align-self: stretch;
+      }
     }
 
     &#{$rowChild} {
@@ -278,6 +303,10 @@
       height: auto;
       width: 100%;
       flex-shrink: 0;
+
+      &#{$columnChild}-alignStretch {
+        width: auto;
+      }
     }
 
     &#{$boundaryContent} {
@@ -317,12 +346,19 @@
       &#{$columnChild}-alignEnd {
         align-self: flex-end;
       }
+      &#{$columnChild}-alignStretch {
+        align-self: stretch;
+      }
     }
 
     &#{$rowChild} {
       width: auto;
-      height: 100%;
       flex-shrink: 0;
+      height: 100%;
+
+      &#{$rowChild}-alignStretch {
+        height: auto;
+      }
     }
 
     &#{$columnChild} {

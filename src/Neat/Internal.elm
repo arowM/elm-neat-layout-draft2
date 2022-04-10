@@ -105,6 +105,7 @@ type Alignment
     = AlignStart
     | AlignCenter
     | AlignEnd
+    | AlignStretch
 
 
 type alias Column_ msg =
@@ -192,8 +193,7 @@ type MinWidth
 
 
 type MaxWidth
-    = MaxWidthNone
-    | MaxWidthFit
+    = MaxWidthFit
     | MaxWidthInBs Float
     | MaxWidthInUnit String Float
 
@@ -204,8 +204,7 @@ type MinHeight
 
 
 type MaxHeight
-    = MaxHeightNone
-    | MaxHeightFit
+    = MaxHeightFit
     | MaxHeightInBs Float
     | MaxHeightInUnit String Float
 

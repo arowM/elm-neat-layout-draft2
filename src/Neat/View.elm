@@ -11,9 +11,11 @@ module Neat.View exposing
     , RowItem
     , alignCenter
     , alignRight
+    , rowItem
     , topItem
     , middleItem
     , bottomItem
+    , grownRowItem
     , grownTopItem
     , grownMiddleItem
     , grownBottomItem
@@ -23,9 +25,11 @@ module Neat.View exposing
     , ColumnItem
     , alignMiddle
     , alignBottom
+    , columnItem
     , leftItem
     , centerItem
     , rightItem
+    , grownColumnItem
     , grownLeftItem
     , grownCenterItem
     , grownRightItem
@@ -72,9 +76,11 @@ module Neat.View exposing
 
 Each function has the `String` argument, which helps make the DOM modifications more efficient. It must be unique among items in the same row.
 
+@docs rowItem
 @docs topItem
 @docs middleItem
 @docs bottomItem
+@docs grownRowItem
 @docs grownTopItem
 @docs grownMiddleItem
 @docs grownBottomItem
@@ -98,9 +104,11 @@ Each function has the `String` argument, which helps make the DOM modifications 
 
 Each function has the `String` argument, which helps make the DOM modifications more efficient. It must be unique among items in the same row.
 
+@docs columnItem
 @docs leftItem
 @docs centerItem
 @docs rightItem
+@docs grownColumnItem
 @docs grownLeftItem
 @docs grownCenterItem
 @docs grownRightItem
@@ -461,6 +469,30 @@ alignRight (Row config) =
         { config | justify = AlignEnd }
 
 
+{-| Row item with stretched height.
+-}
+rowItem : String -> View gap msg -> RowItem gap msg
+rowItem key (View content) =
+    RowItem
+        { alignSelf = AlignStretch
+        , grow = False
+        , key = key
+        , content = content
+        }
+
+
+{-| Row item with stretched height and width.
+-}
+grownRowItem : String -> View gap msg -> RowItem gap msg
+grownRowItem key (View content) =
+    RowItem
+        { alignSelf = AlignStretch
+        , grow = True
+        , key = key
+        , content = content
+        }
+
+
 {-| Top-aligned item.
 -}
 topItem : String -> View gap msg -> RowItem gap msg
@@ -604,6 +636,30 @@ alignBottom : Column -> Column
 alignBottom (Column config) =
     Column
         { config | justify = AlignEnd }
+
+
+{-| Column item with stretched width.
+-}
+columnItem : String -> View gap msg -> ColumnItem gap msg
+columnItem key (View content) =
+    ColumnItem
+        { alignSelf = AlignStretch
+        , grow = False
+        , key = key
+        , content = content
+        }
+
+
+{-| Column item with stretched width and height.
+-}
+grownColumnItem : String -> View gap msg -> ColumnItem gap msg
+grownColumnItem key (View content) =
+    ColumnItem
+        { alignSelf = AlignStretch
+        , grow = True
+        , key = key
+        , content = content
+        }
 
 
 {-| Left-aligned item.

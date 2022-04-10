@@ -19,11 +19,9 @@ module Neat.Boundary exposing
     , setMinHeightInBs
     , setMinHeightInEm
     , setMinHeightInRem
-    , setMaxWidthInfinite
     , setMaxWidthInBs
     , setMaxWidthInEm
     , setMaxWidthInRem
-    , setMaxHeightInfinite
     , setMaxHeightInBs
     , setMaxHeightInEm
     , setMaxHeightInRem
@@ -128,7 +126,6 @@ The initial _minimum height_ is zero without enabling child overflow.
 
 The initial value for maximum width is _fit_, which shrinks as much as its children do not overhang it.
 
-@docs setMaxWidthInfinite
 @docs setMaxWidthInBs
 @docs setMaxWidthInEm
 @docs setMaxWidthInRem
@@ -138,7 +135,6 @@ The initial value for maximum width is _fit_, which shrinks as much as its child
 
 The initial value for maximum height is _fit_, which shrinks as much as its children do not overhang it.
 
-@docs setMaxHeightInfinite
 @docs setMaxHeightInBs
 @docs setMaxHeightInEm
 @docs setMaxHeightInRem
@@ -565,13 +561,6 @@ setMinHeight length (Boundary boundary) =
     Boundary { boundary | minHeight = length }
 
 
-{-| Set the maximum width to _infinite_, which will be stretched horizontally as much as it does not overhang the parent element.
--}
-setMaxWidthInfinite : Boundary msg -> Boundary msg
-setMaxWidthInfinite =
-    setMaxWidth MaxWidthNone
-
-
 {-| Set the maximum width as a percentage of the _base size_.
 e.g., `setMaxWidthInBs 100` set the _maximum width_ the same length as the _base size_.
 -}
@@ -607,13 +596,6 @@ setMaxWidth length (Boundary boundary) =
             | maxWidth = length
             , width = FlexSize
         }
-
-
-{-| Set the maximum height to _infinite_, which will be stretched vertically as much as it does not overhang the parent element.
--}
-setMaxHeightInfinite : Boundary msg -> Boundary msg
-setMaxHeightInfinite =
-    setMaxHeight MaxHeightNone
 
 
 {-| Set the maximum height as a percentage of the _base size_.

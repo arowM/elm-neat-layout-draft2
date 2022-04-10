@@ -565,30 +565,34 @@ renderBoundary renderer { self } o =
                     ]
 
         TextsContent texts ->
-            texts
-                |> List.indexedMap
-                    (\n inline ->
-                        ( "content" ++ String.fromInt n
-                        , Mixin.node inline.nodeName
-                            [ inline.mixin
-                            , class "boundary_text"
-                            ]
-                            [ Html.text inline.text
-                            ]
+            Mixin.node o.nodeName
+                [ base
+                , class "boundary-text"
+                ]
+                [ texts
+                    |> List.indexedMap
+                        (\n inline ->
+                            ( "content" ++ String.fromInt n
+                            , Mixin.node inline.nodeName
+                                [ inline.mixin
+                                , class "boundary_text"
+                                ]
+                                [ Html.text inline.text
+                                ]
+                            )
                         )
-                    )
-                |> (\children ->
-                        children
-                            ++ List.map (renderOverlay renderer) overlays
-                   )
-                |> Mixin.keyed o.nodeName
-                    [ base
-                    , class "boundary-text"
-                    ]
+                    |> (\children ->
+                            children
+                                ++ List.map (renderOverlay renderer) overlays
+                       )
+                    |> Mixin.keyed "div"
+                        [ class "boundary_textMargin"
+                        ]
+                ]
 
         StringContent str ->
             Mixin.node o.nodeName
-                [ o.mixin
+                [ base
                 ]
                 [ Html.text str
                 ]
@@ -710,6 +714,9 @@ renderRow renderer { inherit, self } o =
 
                     AlignEnd ->
                         class "row-justifyEnd"
+
+                    AlignStretch ->
+                        class "row-justifyStretch"
                 ]
 
         childMixin item =
@@ -731,6 +738,9 @@ renderRow renderer { inherit, self } o =
 
                         AlignEnd ->
                             class "rowChild-alignEnd"
+
+                        AlignStretch ->
+                            class "rowChild-alignStretch"
                     ]
             }
     in
@@ -772,6 +782,9 @@ renderColumn renderer { inherit, self } o =
 
                     AlignEnd ->
                         class "column-justifyEnd"
+
+                    AlignStretch ->
+                        class "column-justifyStretch"
                 ]
 
         childMixin item =
@@ -793,6 +806,9 @@ renderColumn renderer { inherit, self } o =
 
                         AlignEnd ->
                             class "columnChild-alignEnd"
+
+                        AlignStretch ->
+                            class "columnChild-alignStretch"
                     ]
             }
     in

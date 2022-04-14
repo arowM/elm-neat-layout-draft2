@@ -127,10 +127,6 @@
         width: auto;
       }
 
-      &#{$boundary}-horizontalOverflow {
-        width: 0;
-      }
-
       &#{$heightFlex}:not(#{$boundary}-verticalOverflow) {
         height: 100%;
 
@@ -167,6 +163,7 @@
       }
 
       &#{$boundary}-horizontalOverflow {
+        width: 0;
         flex-shrink: 1;
 
         &#{$boundary}-hasMaxWidth {
@@ -180,10 +177,6 @@
 
       &:not(#{$boundary}-verticalOverflow) {
         height: auto;
-      }
-
-      &#{$boundary}-verticalOverflow {
-        height: 0;
       }
 
       &#{$widthFlex}:not(#{$boundary}-horizontalOverflow) {
@@ -221,6 +214,7 @@
 
       &#{$boundary}-verticalOverflow {
         flex-shrink: 1;
+        height: 0;
 
         &#{$boundary}-hasMaxHeight {
           max-height: var(--max-height);

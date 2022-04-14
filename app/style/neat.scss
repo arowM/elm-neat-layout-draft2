@@ -121,8 +121,15 @@
     }
 
     &#{$rowChild} {
-      width: auto;
       flex-shrink: 1;
+
+      &:not(#{$boundary}-horizontalOverflow) {
+        width: auto;
+      }
+
+      &#{$boundary}-horizontalOverflow {
+        width: 0;
+      }
 
       &#{$heightFlex}:not(#{$boundary}-verticalOverflow) {
         height: 100%;
@@ -169,8 +176,15 @@
     }
 
     &#{$columnChild} {
-      height: auto;
       flex-shrink: 0;
+
+      &:not(#{$boundary}-verticalOverflow) {
+        height: auto;
+      }
+
+      &#{$boundary}-verticalOverflow {
+        height: 0;
+      }
 
       &#{$widthFlex}:not(#{$boundary}-horizontalOverflow) {
         width: 100%;
@@ -296,7 +310,7 @@
     &#{$rowChild} {
       width: auto;
       height: auto;
-      flex-shrink: 0;
+      flex-shrink: 1;
     }
 
     &#{$columnChild} {
@@ -353,7 +367,7 @@
 
     &#{$rowChild} {
       width: auto;
-      flex-shrink: 0;
+      flex-shrink: 1;
       height: 100%;
 
       &#{$rowChild}-alignStretch {

@@ -33,6 +33,10 @@ module Neat.Boundary exposing
     , Layered
     , mapLayered
     , toLayered
+    , none
+    , when
+    , unless
+    , withMaybe
     , setGap
     , setNodeName
     , html
@@ -154,6 +158,14 @@ The initial value for maximum height is _fit_, which shrinks as much as its chil
 @docs Layered
 @docs mapLayered
 @docs toLayered
+
+
+# Handle Conditions
+
+@docs none
+@docs when
+@docs unless
+@docs withMaybe
 
 
 # Convert to `View`
@@ -731,6 +743,56 @@ toLayered (Boundary boundary) =
             | enforcePointerEvent = True
         }
         |> mapBoundary Layered
+
+
+
+-- Handle conditions
+
+
+{-| Generates no HTML nodes.
+This is useful for handling elements which only appears under certain conditions.
+
+    when p v =
+        if p then
+            v
+
+        else
+            none
+
+-}
+none : Boundary a
+none =
+    Boundary defaultBoundary
+
+
+{-| Insert a view only when a condition is met.
+-}
+when : Bool -> Boundary msg -> Boundary msg
+when p v =
+    if p then
+        v
+
+    else
+        none
+
+
+{-| Insert a view unless a condition is met.
+-}
+unless : Bool -> Boundary msg -> Boundary msg
+unless p =
+    when <| not p
+
+
+{-| Insert a view only if the given value is `Just`.
+-}
+withMaybe : Maybe a -> (a -> Boundary msg) -> Boundary msg
+withMaybe ma f =
+    case ma of
+        Just a ->
+            f a
+
+        Nothing ->
+            none
 
 
 

@@ -39,6 +39,11 @@ config =
     , NoImportingEverything.rule []
     , NoMissingTypeAnnotation.rule
     , NoMissingTypeExpose.rule
+        |> Rule.ignoreErrorsForFiles
+            [ "src/Neat.elm"
+            , "src/Neat/View.elm"
+            , "src/Neat/Boundary.elm"
+            ]
     , NoUnused.CustomTypeConstructorArgs.rule
     , NoUnused.CustomTypeConstructors.rule
         []
@@ -47,6 +52,7 @@ config =
         |> Rule.ignoreErrorsForDirectories
             [ "tests/VerifyExamples"
             , "src/Neat"
+            , "app"
             ]
         |> Rule.ignoreErrorsForFiles
             [ "src/Neat.elm"
@@ -54,6 +60,7 @@ config =
     , NoUnused.Modules.rule
         |> Rule.ignoreErrorsForDirectories
             [ "src/Neat"
+            , "app"
             ]
         |> Rule.ignoreErrorsForFiles
             [ "src/Neat.elm"

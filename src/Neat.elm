@@ -63,9 +63,8 @@ You can use custom gaps just by declaring new types and `IsGap` values for them.
 
 -}
 
-import Html exposing (Html)
 import Mixin exposing (Mixin)
-import Mixin.Html as Mixin
+import Mixin.Html as Html exposing (Html)
 import Neat.Internal as Internal
     exposing
         ( Alignment(..)
@@ -398,7 +397,7 @@ render (Renderer renderer) (Boundary boundary) =
     in
     Html.div
         []
-        [ Mixin.node "style"
+        [ Html.node "style"
             [ Mixin.style "display" "none"
             ]
             [ Html.text neatLayoutStyle
@@ -517,10 +516,10 @@ renderBoundary renderer { self } o =
 
         ViewContent content ->
             if o.verticalOverflow && o.innerGap.vertical /= 0 then
-                Mixin.node o.nodeName
+                Html.node o.nodeName
                     [ base
                     ]
-                    [ Mixin.keyed "div"
+                    [ Html.keyed "div"
                         [ class "boundary_scroller"
                         , class "boundary_scroller-verticalScroll"
                         ]
@@ -530,7 +529,7 @@ renderBoundary renderer { self } o =
                     ]
 
             else if content == None then
-                Mixin.keyed o.nodeName
+                Html.keyed o.nodeName
                     [ base
                     , class "boundary-view"
                     , class "boundary-view-noContent"
@@ -538,7 +537,7 @@ renderBoundary renderer { self } o =
                     (List.map (renderOverlay renderer) overlays)
 
             else
-                Mixin.keyed o.nodeName
+                Html.keyed o.nodeName
                     [ base
                     , class "boundary-view"
                     , class "boundary-view-hasContent"
@@ -559,13 +558,13 @@ renderBoundary renderer { self } o =
                         cs
                             ++ List.map (renderOverlay renderer) overlays
                    )
-                |> Mixin.keyed o.nodeName
+                |> Html.keyed o.nodeName
                     [ base
                     , class "boundary-html"
                     ]
 
         TextsContent texts ->
-            Mixin.node o.nodeName
+            Html.node o.nodeName
                 [ base
                 , class "boundary-text"
                 ]
@@ -573,7 +572,7 @@ renderBoundary renderer { self } o =
                     |> List.indexedMap
                         (\n inline ->
                             ( "content" ++ String.fromInt n
-                            , Mixin.node inline.nodeName
+                            , Html.node inline.nodeName
                                 [ inline.mixin
                                 , class "boundary_text"
                                 ]
@@ -585,13 +584,13 @@ renderBoundary renderer { self } o =
                             children
                                 ++ List.map (renderOverlay renderer) overlays
                        )
-                    |> Mixin.keyed "div"
+                    |> Html.keyed "div"
                         [ class "boundary_textMargin"
                         ]
                 ]
 
         StringContent str ->
-            Mixin.node o.nodeName
+            Html.node o.nodeName
                 [ base
                 ]
                 [ Html.text str
@@ -746,7 +745,7 @@ renderRow renderer { inherit, self } o =
     in
     case o.children of
         Children item [] ->
-            Mixin.keyed o.nodeName
+            Html.keyed o.nodeName
                 [ base
                 , class "row-single"
                 ]
@@ -759,7 +758,7 @@ renderRow renderer { inherit, self } o =
                     (\item ->
                         ( item.key, render_ renderer (childMixin item) item.content )
                     )
-                |> Mixin.keyed o.nodeName
+                |> Html.keyed o.nodeName
                     [ base
                     , class "row-multi"
                     ]
@@ -814,7 +813,7 @@ renderColumn renderer { inherit, self } o =
     in
     case o.children of
         Children item [] ->
-            Mixin.keyed o.nodeName
+            Html.keyed o.nodeName
                 [ base
                 , class "column-single"
                 ]
@@ -827,7 +826,7 @@ renderColumn renderer { inherit, self } o =
                     (\item ->
                         ( item.key, render_ renderer (childMixin item) item.content )
                     )
-                |> Mixin.keyed o.nodeName
+                |> Html.keyed o.nodeName
                     [ base
                     , class "column-multi"
                     ]

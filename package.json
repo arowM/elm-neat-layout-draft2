@@ -21,11 +21,11 @@
   },
   "scripts": {
     "doc": "elm-doc-preview -p 8091",
-    "start": "parcel serve app/index.html --public-url /elm-app-template -p 8092",
-    "build": "rimraf dist/ && parcel build app/index.html --no-source-maps --dist-dir dist/ --public-url /elm-app-template",
+    "start": "cd sample && parcel serve ../app/index.html --public-url /elm-app-template -p 8092",
+    "build": "rimraf dist/ && cd sample && parcel build ../app/index.html --no-source-maps --dist-dir ../dist/ --public-url /elm-app-template",
     "format": "stylelint --fix app/style/ && elm-format app src",
     "review": "elm-review --fix src app",
-    "test": "stylelint app/style/ && elm-review src app && elm-format --validate src/ app/ && npx elm make --output=/dev/null app/Main.elm # && elm-doc-preview --output /dev/null && elm-test && elm-verify-examples -r"
+    "test": "stylelint app/style/ && elm-review src app && elm-format --validate src/ app/ && cd sample && elm make --output=/dev/null ../app/Main.elm && cd ../ # && elm-doc-preview --output /dev/null && elm-test && elm-verify-examples -r"
   },
   "author": "Kadzuya Okamoto",
   "license": "MIT",

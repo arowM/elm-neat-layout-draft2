@@ -83,7 +83,7 @@
       margin: calc(var(--outer-gap-y) / -2) 0;
 
       & > #{$boundary}_text {
-        display: inline-block;
+        display: inline;
         line-height: calc(1em + var(--outer-gap-y));
       }
     }

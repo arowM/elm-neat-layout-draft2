@@ -52,7 +52,7 @@ config =
         |> Rule.ignoreErrorsForDirectories
             [ "tests/VerifyExamples"
             , "src/Neat"
-            , "app"
+            , "sample/app"
             ]
         |> Rule.ignoreErrorsForFiles
             [ "src/Neat.elm"
@@ -60,7 +60,7 @@ config =
     , NoUnused.Modules.rule
         |> Rule.ignoreErrorsForDirectories
             [ "src/Neat"
-            , "app"
+            , "sample/app"
             ]
         |> Rule.ignoreErrorsForFiles
             [ "src/Neat.elm"
